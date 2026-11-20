@@ -1,0 +1,139 @@
+Company name,Contact person,Phone,Email,Area,Address,Industry,Total shipments,First shipment date,Last shipment date,Last meeting date,Last contact date,Next follow-up,Notes
+Ashoka Polymers & Co,Amit Patel,9000000123,,Andheri,"Unit 399, Trade Centre",Chemicals,34,24/12/2020,08/09/2026,20/08/2026,10/11/2026,,
+Himalaya Garments & Co,Anjali Reddy,9000000138,,Andheri,"Unit 153, Trade Centre",Textiles,27,20/01/2025,03/11/2026,31/07/2026,04/11/2026,,
+Pragati Agro,Rahul Shah,9000000125,pragati125@example.com,Andheri,"Unit 249, Trade Centre",Agriculture,53,05/12/2019,03/09/2026,24/09/2026,09/11/2026,20/11/2026,Price sensitive
+Harbour Impex,Joseph Gupta,9000000115,,Thane,"Unit 361, Trade Centre",Trading,25,28/07/2021,30/10/2026,02/09/2026,09/11/2026,20/11/2026,Decision maker is the owner
+Bluewave Auto Parts International,Arjun Bhatt,9000000191,,Kurla,"Unit 374, Trade Centre",Automotive,11,12/03/2024,14/09/2024,,03/09/2025,,
+Konkan Steel Industries,Ramesh Desai,9000000154,konkan154@example.com,Powai,"Unit 11, MIDC",Metals,20,30/10/2020,11/01/2026,06/01/2026,25/09/2026,,Price sensitive
+Chandrakant Agro International,Sneha Fernandes,9000000215,,BKC,"Unit 303, MIDC",Agriculture,0,,,24/08/2026,24/08/2026,20/11/2026,
+Dhanlaxmi Engineering Pvt Ltd,Lakshmi Mehta,9000000121,,Goregaon,"Unit 167, Commercial Complex",Engineering,21,19/06/2024,27/09/2026,13/08/2026,13/11/2026,,
+Kaveri Textiles Enterprises,Ritu Reddy,9000000171,kaveri171@example.com,Powai,"Unit 297, Commercial Complex",Textiles,9,18/10/2024,09/11/2025,03/12/2025,28/05/2026,,Asked for a rate card
+Harbour Packaging LLP,Vikram Sawant,9000000196,harbour196@example.com,Powai,"Unit 257, Industrial Estate",Packaging,14,19/09/2025,30/09/2024,,22/05/2025,,Prefers morning calls
+Chandrakant Chemicals & Co,Arjun Chopra,9000000177,,Kurla,"Unit 36, Industrial Estate",Chemicals,17,28/07/2025,05/03/2026,,,,
+Bluewave Textiles,Harpreet Sawant,9000000175,,Andheri,"Unit 146, Commercial Complex",Textiles,8,12/09/2023,08/08/2026,18/09/2026,18/09/2026,23/11/2026,Seasonal: peaks before Diwali
+Kaveri Plastics,Deepa Fernandes,9000000155,,Powai,"Unit 55, Trade Centre",Chemicals,13,26/08/2021,24/12/2025,,13/07/2026,26/11/2026,
+Suryodaya Garments Enterprises,Rajesh Mehta,9000000130,suryodaya130@example.com,Goregaon,"Unit 142, Trade Centre",Textiles,20,26/08/2019,06/10/2026,11/09/2026,14/10/2026,,Ships mostly to UAE
+Vaibhav Spices International,Vikram Desai,9000000140,vaibhav140@example.com,Andheri,"Unit 206, Business Park",Food,17,31/12/2021,10/04/2026,05/08/2026,,,"Uses two forwarders, we have ~40%"
+Anchor Spices,Ritu Gupta,9000000106,,Goregaon,"Unit 37, Business Park",Food,171,24/05/2025,25/10/2026,27/10/2026,15/11/2026,,Decision maker is the owner
+Trimurti Chemicals,Manoj Pillai,9000000178,trimurti178@example.com,Malad,"Unit 368, Business Park",Chemicals,20,28/06/2020,12/12/2025,19/01/2026,27/06/2026,,
+Nandini Plastics Enterprises,Rajesh Desai,9000000190,nandini190@example.com,Andheri,"Unit 80, Commercial Complex",Chemicals,6,23/09/2023,15/10/2025,,,,
+Aarav Spices Enterprises,Ritu Fernandes,9000000170,,BKC,"Unit 251, Commercial Complex",Food,4,24/09/2022,15/12/2025,04/04/2026,09/10/2026,,
+Trimurti Foods,Neha Nair,9000000109,,Andheri,"Unit 36, Business Park",Food,211,10/03/2023,11/11/2026,28/10/2026,05/11/2026,,
+Nandini Auto Parts LLP,Harpreet Iyer,9000000189,nandini189@example.com,Bhiwandi,"Unit 115, Business Park",Automotive,14,18/09/2019,03/10/2025,26/10/2024,17/10/2025,,Ships mostly to UAE
+Indus Packaging Industries,Suresh Fernandes,9000000110,,Powai,"Unit 242, Business Park",Packaging,88,20/08/2024,27/10/2026,31/10/2026,08/11/2026,,
+Vaibhav Handicrafts LLP,Sneha Agarwal,9000000172,vaibhav172@example.com,Bhiwandi,"Unit 252, Trade Centre",Handicrafts,5,13/06/2021,09/07/2026,23/03/2026,30/09/2026,,Decision maker is the owner
+Vaibhav Handicrafts Industries,Nikhil Khan,9000000183,vaibhav183@example.com,Malad,"Unit 299, Trade Centre",Handicrafts,3,26/02/2024,23/08/2025,10/08/2024,,,Seasonal: peaks before Diwali
+Himalaya Foods,Ramesh Nair,9000000137,,Thane,"Unit 225, Commercial Complex",Food,34,31/07/2023,28/10/2026,24/07/2026,05/11/2026,,Seasonal: peaks before Diwali
+Anchor Plastics Enterprises,Deepa Reddy,9000000194,,Thane,"Unit 293, MIDC",Chemicals,8,23/12/2023,23/09/2024,,,,Prefers morning calls
+Konkan Polymers LLP,Ritu Nair,9000000205,konkan205@example.com,BKC,"Unit 339, Business Park",Chemicals,6,22/07/2025,13/07/2024,,,21/11/2026,Price sensitive
+Vaibhav Spices Industries,Arjun Desai,9000000228,,Bhiwandi,"Unit 287, Industrial Estate",Food,0,,,,23/10/2026,,Decision maker is the owner
+Konkan Pharma Pvt Ltd,Nikhil Gupta,9000000206,konkan206@example.com,Andheri,"Unit 318, MIDC",Pharma,15,24/09/2019,03/11/2025,,06/10/2025,,
+M/s Chandrakant Pharma LLP,Meera Singh,9000000107,,Bhiwandi,"Unit 281, Commercial Complex",Pharma,232,10/12/2019,01/11/2026,07/11/2026,10/11/2026,,
+Harbour Pharma,Suresh Desai,9000000158,harbour158@example.com,BKC,"Unit 185, Business Park",Pharma,4,06/08/2019,30/01/2026,07/02/2026,25/10/2026,,Decision maker is the owner
+Vedant Exports Pvt Ltd,Farah Mehta,9000000101,,Andheri,"Unit 67, Commercial Complex",Trading,226,20/11/2023,31/10/2026,29/10/2026,10/11/2026,,"Uses two forwarders, we have ~40%"
+Sahyadri Foods Industries,Arjun Joshi,9000000156,,Thane,"Unit 356, Business Park",Food,5,08/12/2018,26/11/2025,01/12/2025,,,Prefers morning calls
+Vedant Spices LLP,Ritu Shah,9000000174,vedant174@example.com,Thane,"Unit 236, Trade Centre",Food,17,20/12/2024,05/09/2026,,26/09/2026,,Price sensitive
+Himalaya Packaging Industries,Imran Kulkarni,9000000120,,BKC,"Unit 97, Commercial Complex",Packaging,37,16/01/2021,26/08/2026,20/10/2026,02/11/2026,,"Uses two forwarders, we have ~40%"
+Indus Auto Parts Industries,Amit Sawant,9000000176,indus176@example.com,Andheri,"Unit 363, MIDC",Automotive,7,15/11/2023,06/05/2026,15/09/2026,15/09/2026,,Decision maker is the owner
+Nandini Chemicals & Co,Deepa Fernandes,9000000169,nandini169@example.com,Andheri,"Unit 14, Business Park",Chemicals,14,09/09/2024,08/05/2026,28/10/2025,28/08/2026,,
+Trimurti Foods,Neha Nair,9000000109,,Andheri,"Unit 36, Business Park",Food,211,10/03/2023,11/11/2026,28/10/2026,05/11/2026,,
+Vedant Textiles Industries,Rajesh Joshi,9000000207,,Andheri,"Unit 184, Business Park",Textiles,3,09/04/2024,12/03/2025,,18/03/2025,,
+Trimurti Exports & Co,Arjun Joshi,9000000147,,Andheri,"Unit 149, Industrial Estate",Trading,3,24/03/2024,31/05/2026,,28/05/2026,,
+Silverline Packaging International,Ritu Fernandes,9000000218,silverline218@example.com,Thane,"Unit 168, Industrial Estate",Packaging,0,,,,,,"Uses two forwarders, we have ~40%"
+Matrix Machinery Enterprises,Lakshmi Fernandes,9000000143,,Andheri,"Unit 297, Industrial Estate",Engineering,19,17/07/2023,17/07/2026,25/08/2026,23/10/2026,,Ships mostly to UAE
+Sahyadri Chemicals LLP,Rajesh Joshi,9000000116,,Lower Parel,"Unit 133, MIDC",Chemicals,76,17/02/2025,05/10/2026,29/07/2026,28/10/2026,,Price sensitive
+Vaibhav Textiles,Deepa Bhatt,9000000161,,Powai,"Unit 101, Commercial Complex",Textiles,15,17/07/2024,01/04/2026,17/12/2025,18/07/2026,,
+Vaibhav Machinery International,Lakshmi Singh,9000000201,vaibhav201@example.com,Andheri,"Unit 119, Business Park",Engineering,11,30/01/2025,29/06/2024,14/10/2024,18/12/2025,,
+Kaveri Machinery Pvt Ltd,Arjun Reddy,9000000203,,Andheri,"Unit 206, MIDC",Engineering,11,07/09/2023,09/10/2025,08/12/2024,,,Ships mostly to UAE
+Kaveri Engineering,Pooja Joshi,9000000208,kaveri208@example.com,Andheri,"Unit 294, Business Park",Engineering,4,20/02/2020,03/10/2024,,,,Prefers morning calls
+Narmada Spices LLP,Arjun Bhatt,9000000141,narmada141@example.com,Powai,"Unit 9, Trade Centre",Food,9,21/03/2022,29/04/2026,14/02/2026,,,Price sensitive
+Chandrakant Plastics Enterprises,Manoj Khan,9000000157,,BKC,"Unit 176, MIDC",Chemicals,6,20/01/2025,27/06/2026,21/08/2026,21/08/2026,,
+M/S SHAKTI IMPEX ENTERPRISES,,,,,,,82,,19/11/2026,,18/11/2026,,Shipped again recently
+Pragati Auto Parts LLP,Harpreet Shah,9000000214,,Andheri,"Unit 364, Industrial Estate",Automotive,0,,,,01/10/2026,,
+Trimurti Steel Enterprises,Manoj Mehta,9000000226,trimurti226@example.com,Bhiwandi,"Unit 370, Business Park",Metals,0,,,22/09/2026,22/09/2026,,
+Anchor Agro,Imran Patel,9000000118,,Andheri,"Unit 310, Commercial Complex",Agriculture,35,06/03/2024,10/09/2026,04/09/2026,28/10/2026,,
+Kaveri Chemicals Industries,Tushar Nair,9000000135,,BKC,"Unit 356, Industrial Estate",Chemicals,54,09/10/2020,08/08/2026,21/09/2026,14/10/2026,26/11/2026,Price sensitive
+Dhanlaxmi Plastics LLP,Rahul Chopra,9000000152,,Kurla,"Unit 91, Trade Centre",Chemicals,8,16/01/2019,16/02/2026,30/10/2025,,,
+Indus Agro Industries,Suresh Gupta,9000000164,,Andheri,"Unit 140, MIDC",Agriculture,12,01/08/2022,12/06/2026,31/05/2026,05/08/2026,,Price sensitive
+Aarav Handicrafts LLP,Sneha Joshi,9000000223,,Goregaon,"Unit 246, Trade Centre",Handicrafts,0,,,02/11/2026,02/11/2026,,Prefers morning calls
+Matrix Impex Industries,Neha Nair,9000000128,matrix128@example.com,Andheri,"Unit 87, Industrial Estate",Trading,23,20/08/2023,04/09/2026,15/08/2026,18/10/2026,,
+Himalaya Polymers Pvt Ltd,Sanjay Mehta,9000000193,,Bhiwandi,"Unit 200, MIDC",Chemicals,12,27/07/2025,13/11/2025,,,,
+Matrix Chemicals International,Joseph Patel,9000000146,matrix146@example.com,Malad,"Unit 395, Industrial Estate",Chemicals,16,19/12/2024,16/02/2026,,,,
+Meridian Foods Pvt Ltd,Neha Singh,9000000102,,Thane,"Unit 89, Commercial Complex",Food,149,04/04/2024,11/11/2026,22/10/2026,07/11/2026,,
+Matrix Foods Industries,Priya Kulkarni,9000000179,,Andheri,"Unit 292, Business Park",Food,14,03/04/2024,30/10/2024,15/11/2025,,,Price sensitive
+ANCHOR SPICES,Ritu Gupta,9000000106,,Goregaon,"Unit 37, Business Park",Food,171,24/05/2025,25/10/2026,27/10/2026,15/11/2026,,
+Kaveri Foods Industries,Anjali Patel,9000000159,,Bhiwandi,"Unit 194, MIDC",Food,11,08/09/2021,13/06/2026,04/06/2026,,,
+Chandrakant Pharma LLP,Meera Singh,9000000107,,Bhiwandi,"Unit 281, Commercial Complex",Pharma,232,10/12/2019,01/11/2026,07/11/2026,10/11/2026,,Seasonal: peaks before Diwali
+Vedant Textiles International,Kavita Shah,9000000182,,Nariman Point,"Unit 252, Trade Centre",Textiles,5,21/09/2025,11/03/2025,,,,Prefers morning calls
+Harbour Polymers Enterprises,Joseph Shah,9000000219,,Nariman Point,"Unit 304, Commercial Complex",Chemicals,0,,,,,,Ships mostly to UAE
+Himalaya Packaging & Co,Farah Agarwal,9000000221,himalaya221@example.com,Malad,"Unit 145, Trade Centre",Packaging,0,,,06/11/2026,06/11/2026,,Ships mostly to UAE
+Aarav Impex & Co,Ramesh Reddy,9000000198,aarav198@example.com,Andheri,"Unit 395, Trade Centre",Trading,11,17/08/2021,09/10/2025,,21/04/2026,,Asked for a rate card
+Pragati Handicrafts Enterprises,Amit Khan,9000000133,,Bhiwandi,"Unit 356, Industrial Estate",Handicrafts,53,04/11/2019,05/09/2026,08/08/2026,11/11/2026,,Decision maker is the owner
+Ashoka Foods Industries,Suresh Joshi,9000000187,ashoka187@example.com,BKC,"Unit 224, Commercial Complex",Food,2,06/10/2020,12/08/2025,04/02/2025,,,Prefers morning calls
+Himalaya Chemicals & Co,Pooja Gupta,9000000150,,Malad,"Unit 257, Trade Centre",Chemicals,17,17/05/2020,26/11/2025,,13/07/2026,,Seasonal: peaks before Diwali
+Silverline Garments Pvt Ltd,Harpreet Fernandes,9000000173,silverline173@example.com,Bhiwandi,"Unit 264, Business Park",Textiles,9,30/01/2020,04/12/2025,,27/10/2026,,Seasonal: peaks before Diwali
+Dhanlaxmi Pharma Pvt Ltd,Suresh Sawant,9000000151,dhanlaxmi151@example.com,Andheri,"Unit 175, Business Park",Pharma,16,04/06/2025,19/07/2026,,29/09/2026,,Price sensitive
+Himalaya Agro International,Lakshmi Joshi,9000000229,himalaya229@example.com,BKC,"Unit 169, MIDC",Agriculture,0,,,12/10/2026,12/10/2026,,Decision maker is the owner
+Anchor Auto Parts Pvt Ltd,Deepa Shah,9000000129,,Andheri,"Unit 114, Business Park",Automotive,71,04/11/2022,09/10/2026,20/10/2026,20/10/2026,,
+Vedant Foods & Co,Deepa Shah,9000000216,vedant216@example.com,Malad,"Unit 275, Commercial Complex",Food,0,,,,05/10/2026,,
+Vaibhav Agro Enterprises,Neha Bhatt,9000000108,,Goregaon,"Unit 313, Business Park",Agriculture,225,31/03/2021,09/11/2026,23/10/2026,13/11/2026,,
+Sahyadri Spices Pvt Ltd,Tushar Pillai,9000000181,,Lower Parel,"Unit 340, MIDC",Food,11,16/12/2021,29/11/2024,04/04/2025,,,Decision maker is the owner
+Sahyadri Polymers Enterprises,Harpreet Joshi,9000000202,sahyadri202@example.com,Andheri,"Unit 240, Commercial Complex",Chemicals,12,02/06/2023,15/02/2025,10/12/2025,10/12/2025,,
+Kaveri Garments Pvt Ltd,Joseph Joshi,9000000209,kaveri209@example.com,Andheri,"Unit 100, Industrial Estate",Textiles,15,30/11/2022,22/07/2024,04/09/2024,29/06/2025,,Prefers morning calls
+vaibhav agro enterprises,Neha Bhatt,9000000108,,Goregaon,"Unit 313, Business Park",Agriculture,225,31/03/2021,09/11/2026,23/10/2026,13/11/2026,,
+Suryodaya Electricals International,Rahul Khan,9000000148,,Malad,"Unit 350, Business Park",Electrical,4,11/09/2019,16/10/2025,15/07/2026,15/07/2026,,
+Annapurna Textiles LLP,Deepa Joshi,9000000136,,Vashi,"Unit 387, Trade Centre",Textiles,30,07/03/2025,17/10/2026,20/08/2026,28/10/2026,,Price sensitive
+Chandrakant Spices Industries,Priya Nair,9000000162,,Powai,"Unit 338, MIDC",Food,13,12/09/2021,03/11/2025,28/02/2026,18/06/2026,,
+Dhanlaxmi Electricals Pvt Ltd,Meera Desai,9000000230,,Goregaon,"Unit 183, MIDC",Electrical,0,,,,02/11/2026,,
+Suryodaya Machinery & Co,Manoj Patel,9000000192,suryodaya192@example.com,Lower Parel,"Unit 189, Industrial Estate",Engineering,8,02/04/2021,09/01/2025,,,,
+Bluewave Spices Industries,Ritu Desai,9000000139,bluewave139@example.com,Andheri,"Unit 217, Business Park",Food,24,07/06/2023,21/08/2026,01/08/2026,01/11/2026,,"Uses two forwarders, we have ~40%"
+Metro International and Company,,,,,,,93,,18/11/2026,,19/11/2026,,Shipped again recently
+Matrix Auto Parts & Co,Nikhil Khan,9000000149,matrix149@example.com,Andheri,"Unit 220, MIDC",Automotive,5,11/08/2025,04/11/2025,10/07/2026,10/07/2026,,Prefers morning calls
+Harbour Chemicals,Farah Mehta,9000000225,,Thane,"Unit 3, Trade Centre",Chemicals,0,,,26/09/2026,26/09/2026,20/11/2026,Asked for a rate card
+Anchor Textiles Pvt Ltd,Anjali Reddy,9000000200,,Kurla,"Unit 121, Business Park",Textiles,6,14/02/2020,14/07/2024,,12/09/2025,,
+Suryodaya Packaging Enterprises,Sneha Nair,9000000144,,Andheri,"Unit 230, Trade Centre",Packaging,7,17/02/2019,20/08/2026,16/10/2025,,,Asked for a rate card
+Indus Foods Pvt Ltd,Deepa Desai,9000000103,indus103@example.com,Powai,"Unit 189, Business Park",Food,285,10/10/2022,16/11/2026,11/11/2026,19/11/2026,,
+  rudra  international & co. ,,,,,,,114,,17/11/2026,,18/11/2026,,Shipped again recently
+Anchor Foods,Ramesh Fernandes,9000000222,,Powai,"Unit 271, MIDC",Food,0,,,,,,Asked for a rate card
+Harbour Engineering Pvt Ltd,Harpreet Fernandes,9000000134,harbour134@example.com,Malad,"Unit 290, Trade Centre",Engineering,20,02/03/2019,23/10/2026,27/09/2026,11/10/2026,,Ships mostly to UAE
+Vaibhav Steel & Co,Imran Joshi,9000000160,,Goregaon,"Unit 139, MIDC",Metals,4,05/10/2020,03/07/2026,15/09/2026,15/09/2026,,Prefers morning calls
+Annapurna Packaging Pvt Ltd,Priya Bhatt,9000000126,,Kurla,"Unit 6, Commercial Complex",Packaging,20,16/01/2019,21/09/2026,01/09/2026,19/10/2026,,Decision maker is the owner
+Aarav Packaging LLP,Harpreet Patel,9000000197,aarav197@example.com,Thane,"Unit 139, Business Park",Packaging,8,29/10/2019,17/01/2025,,,,Asked for a rate card
+Kaveri Electricals International,Rajesh Gupta,9000000119,,Powai,"Unit 164, MIDC",Electrical,43,22/02/2019,08/08/2026,11/08/2026,24/10/2026,,Decision maker is the owner
+Indus Spices,Vikram Chopra,9000000210,,Bhiwandi,"Unit 93, Industrial Estate",Food,7,17/11/2022,16/03/2025,,05/01/2025,,Price sensitive
+Anchor Garments Pvt Ltd,Kavita Nair,9000000142,anchor142@example.com,Vashi,"Unit 190, Trade Centre",Textiles,4,20/01/2022,05/07/2026,16/12/2025,23/10/2026,,Prefers morning calls
+Bluewave Auto Parts Pvt Ltd,Imran Agarwal,9000000122,,Thane,"Unit 27, Commercial Complex",Automotive,63,12/08/2023,07/08/2026,28/10/2026,28/10/2026,,Prefers morning calls
+Harbour Polymers,Meera Agarwal,9000000117,,Bhiwandi,"Unit 46, Industrial Estate",Chemicals,76,24/12/2022,24/08/2026,26/10/2026,27/10/2026,,Prefers morning calls
+ Indus Packaging Industries ,Suresh Fernandes,9000000110,,Powai,"Unit 242, Business Park",Packaging,88,20/08/2024,27/10/2026,31/10/2026,08/11/2026,,
+Meridian Machinery,Anjali Shah,9000000124,,Bhiwandi,"Unit 152, Industrial Estate",Engineering,23,31/05/2023,03/11/2026,14/10/2026,31/10/2026,,Asked for a rate card
+Nandini Agro Industries,Amit Shah,9000000180,nandini180@example.com,Powai,"Unit 63, Business Park",Agriculture,15,02/04/2021,11/08/2025,,,,
+Sahyadri Foods International,Imran Reddy,9000000145,,Vashi,"Unit 226, MIDC",Food,20,17/03/2023,19/01/2026,25/04/2026,15/06/2026,20/11/2026,Price sensitive
+Himalaya Handicrafts Pvt Ltd,Farah Agarwal,9000000113,himalaya113@example.com,Vashi,"Unit 120, Industrial Estate",Handicrafts,179,28/03/2024,12/11/2026,07/11/2026,08/11/2026,,Prefers morning calls
+Dhanlaxmi Textiles Pvt Ltd,Tushar Agarwal,9000000217,dhanlaxmi217@example.com,Andheri,"Unit 321, Industrial Estate",Textiles,0,,,,,,Decision maker is the owner
+Suryodaya Engineering Enterprises,Rajesh Patel,9000000167,suryodaya167@example.com,Powai,"Unit 370, Business Park",Engineering,11,24/02/2020,24/11/2025,03/05/2026,31/10/2026,,Decision maker is the owner
+Harbour Electricals & Co,Ramesh Singh,9000000165,,Powai,"Unit 124, Industrial Estate",Electrical,19,09/12/2018,07/07/2026,09/03/2026,26/09/2026,21/11/2026,
+Bluewave Impex Industries,Anjali Chopra,9000000186,bluewave186@example.com,Andheri,"Unit 339, MIDC",Trading,9,09/09/2019,25/06/2024,26/06/2025,,,Price sensitive
+Konkan Impex International,Amit Agarwal,9000000227,konkan227@example.com,Vashi,"Unit 51, Business Park",Trading,0,,,,,,
+Ashoka Impex LLP,Amit Patel,9000000213,ashoka213@example.com,Andheri,"Unit 303, Business Park",Trading,0,,,,13/11/2026,,
+Vaibhav Engineering Pvt Ltd,Manoj Chopra,9000000184,vaibhav184@example.com,Malad,"Unit 109, Business Park",Engineering,5,07/10/2023,13/07/2024,,26/01/2026,,Asked for a rate card
+Indus Auto Parts Enterprises,Sanjay Reddy,9000000185,,Andheri,"Unit 114, Industrial Estate",Automotive,6,15/02/2022,16/10/2024,,14/06/2025,20/11/2026,"Uses two forwarders, we have ~40%"
+Harbour Textiles,Neha Iyer,9000000195,,Thane,"Unit 173, Trade Centre",Textiles,15,14/12/2022,18/10/2025,,,18/11/2026,
+Ashoka Plastics & Co,Vikram Shah,9000000212,,Powai,"Unit 243, Business Park",Chemicals,0,,,,,,
+Vedant Garments Pvt Ltd,Priya Fernandes,9000000163,,Andheri,"Unit 276, Commercial Complex",Textiles,7,14/02/2020,03/04/2026,01/03/2026,16/10/2026,,
+Nandini Foods Industries,Arjun Singh,9000000153,,Bhiwandi,"Unit 257, Business Park",Food,15,05/04/2025,14/01/2026,01/07/2026,01/07/2026,,Prefers morning calls
+Shivam Polymers LLP,Harpreet Pillai,9000000132,,Goregaon,"Unit 132, MIDC",Chemicals,80,27/08/2021,16/10/2026,18/08/2026,15/10/2026,,Price sensitive
+Dhanlaxmi Chemicals LLP,Tushar Reddy,9000000168,,Vashi,"Unit 197, Business Park",Chemicals,14,09/01/2020,18/11/2025,,04/06/2026,,
+Chandrakant Exports,Rajesh Fernandes,9000000131,,Andheri,"Unit 232, Industrial Estate",Trading,52,21/05/2023,01/08/2026,28/09/2026,14/11/2026,,Decision maker is the owner
+Narmada Foods International,Arjun Pillai,9000000112,,BKC,"Unit 358, Trade Centre",Food,122,09/12/2023,22/10/2026,13/10/2026,12/11/2026,,
+Silverline Packaging,Ramesh Chopra,9000000114,,Powai,"Unit 117, Commercial Complex",Packaging,24,14/10/2024,04/08/2026,18/09/2026,24/10/2026,,Ships mostly to UAE
+Dhanlaxmi Electricals Enterprises,Amit Patel,9000000104,dhanlaxmi104@example.com,Vashi,"Unit 343, Business Park",Electrical,250,11/09/2018,23/10/2026,18/10/2026,17/11/2026,,"Uses two forwarders, we have ~40%"
+Anchor Polymers,Sneha Bhatt,9000000224,,Vashi,"Unit 184, Commercial Complex",Chemicals,0,,,,,,
+Ashoka Steel International,Ritu Fernandes,9000000211,,Bhiwandi,"Unit 265, Trade Centre",Metals,2,14/01/2024,09/11/2025,13/12/2025,13/12/2025,,Asked for a rate card
+Trimurti Plastics Enterprises,Rahul Shah,9000000127,trimurti127@example.com,Andheri,"Unit 157, Business Park",Chemicals,61,31/01/2019,18/09/2026,14/08/2026,04/11/2026,,
+Vedant Foods Industries,Manoj Iyer,9000000111,vedant111@example.com,Andheri,"Unit 31, Commercial Complex",Food,223,08/08/2023,24/10/2026,23/10/2026,16/11/2026,,Ships mostly to UAE
+Dhanlaxmi Handicrafts Industries,Arjun Kulkarni,9000000220,dhanlaxmi220@example.com,Powai,"Unit 210, Commercial Complex",Handicrafts,0,,,30/08/2026,30/08/2026,,
+Himalaya Engineering & Co,Suresh Bhatt,9000000204,,Powai,"Unit 214, Commercial Complex",Engineering,13,30/10/2019,18/12/2024,29/11/2024,,,Ships mostly to UAE
+Nandini Machinery Industries,Imran Sawant,9000000188,nandini188@example.com,Powai,"Unit 174, Commercial Complex",Engineering,1,27/01/2022,27/05/2025,20/08/2025,,,
+Matrix Agro & Co,Neha Iyer,9000000105,,Thane,"Unit 59, Business Park",Agriculture,119,27/04/2021,15/11/2026,15/10/2026,11/11/2026,20/11/2026,
+Ashoka Garments Pvt Ltd,Manoj Joshi,9000000199,ashoka199@example.com,BKC,"Unit 154, Industrial Estate",Textiles,8,13/08/2023,07/11/2024,,06/05/2025,,Prefers morning calls
+Shivam Electricals Enterprises,Imran Chopra,9000000166,,Powai,"Unit 116, MIDC",Electrical,12,27/05/2022,08/03/2026,14/04/2026,06/05/2026,,Ships mostly to UAE
