@@ -21,16 +21,18 @@ export async function proxy(request: NextRequest) {
     },
   );
 
-  const { data } = await supabase.auth.getUser();
+  // Verifies the token locally where possible and refreshes it when it's about to expire.
+  const { data } = await supabase.auth.getClaims();
+  const signedIn = Boolean(data?.claims?.sub);
   const path = request.nextUrl.pathname;
   const isPublic = PUBLIC_PATHS.some((p) => path.startsWith(p));
 
-  if (!data.user && !isPublic) {
+  if (!signedIn && !isPublic) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
-  if (data.user && path === "/login") {
+  if (signedIn && path === "/login") {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     return NextResponse.redirect(url);

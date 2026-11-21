@@ -17,13 +17,15 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
   const today = todayIST();
   const title = formatDate(today, { weekday: "long", day: "numeric", month: "short" });
 
-  // Lazily close yesterday's (and older) plans: unfinished items become backlog.
-  await supabase.rpc("close_stale_plans", { p_today: today });
-  const { data: plan } = await supabase.from("day_plans").select("*").eq("plan_date", today).maybeSingle();
-  const options = await getClientOptions();
+  // First visit of the day: close yesterday's plans (unfinished items become backlog) and
+  // re-score clients. A no-op on later visits. Runs alongside the other lookups.
+  const [, { data: plan }, options] = await Promise.all([
+    supabase.rpc("start_day", { p_today: today }),
+    supabase.from("day_plans").select("*").eq("plan_date", today).maybeSingle(),
+    getClientOptions(),
+  ]);
 
   if (!plan || plan.status === "draft") {
-    await supabase.rpc("refresh_client_scores", { p_today: today });
     const [result, yesterday] = await Promise.all([
       buildSuggestions(supabase, today, profile, area),
       getDaySummary(supabase, addDays(today, -1)),
@@ -54,7 +56,7 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
     );
   }
 
-  const [{ data: items }, { data: unplanned }] = await Promise.all([
+  const [{ data: items }, { data: unplanned }, { data: todays }] = await Promise.all([
     supabase
       .from("plan_items")
       .select("*, clients(id, company, contact_person, phone, area, tier, address)")
@@ -66,8 +68,8 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
       .eq("activity_date", today)
       .is("plan_item_id", null)
       .order("created_at", { ascending: false }),
+    supabase.from("activities").select("type").eq("activity_date", today),
   ]);
-  const { data: todays } = await supabase.from("activities").select("type").eq("activity_date", today);
   const actual = { visit: 0, call: 0, text: 0 };
   for (const a of todays ?? []) actual[a.type as keyof typeof actual]++;
 

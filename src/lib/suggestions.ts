@@ -62,7 +62,7 @@ export async function buildSuggestions(
   const backlogSince = addDays(today, -14);
 
   const stagnantBefore = addDays(today, -(profile.stagnant_after_days ?? 60));
-  const [{ data: due }, { data: missed }, { data: stagnant }] = await Promise.all([
+  const [{ data: due }, { data: missed }, { data: stagnant }, { data: around }] = await Promise.all([
     supabase
       .from("clients")
       .select("id, company, contact_person, phone, area, tier, status, next_due_date, next_follow_up, last_contact_date, last_meeting_date")
@@ -85,6 +85,15 @@ export async function buildSuggestions(
       .or(`last_touch_date.is.null,last_touch_date.lt.${stagnantBefore}`)
       .order("value_score", { ascending: false })
       .limit(REVIVE_PER_DAY * 4),
+    // Candidates for "Also nearby" (filtered by distance once today's area is known).
+    supabase
+      .from("clients")
+      .select("id, company, contact_person, phone, area, tier, status, next_due_date, next_follow_up, last_contact_date, last_meeting_date, last_touch_date, value_score")
+      .neq("status", "lost")
+      .not("area", "is", null)
+      .or(`last_meeting_date.is.null,last_meeting_date.lt.${addDays(today, -14)}`)
+      .order("value_score", { ascending: false })
+      .limit(3000),
   ]);
 
   // ---- Backlog ------------------------------------------------------------
@@ -209,14 +218,6 @@ export async function buildSuggestions(
   // Not due yet and not already suggested, but in/near the area and not visited in 2+ weeks.
   if (focusArea) {
     const already = new Set(all.map((s) => s.clientId));
-    const { data: around } = await supabase
-      .from("clients")
-      .select("id, company, contact_person, phone, area, tier, status, next_due_date, next_follow_up, last_contact_date, last_meeting_date, last_touch_date, value_score")
-      .neq("status", "lost")
-      .not("area", "is", null)
-      .or(`last_meeting_date.is.null,last_meeting_date.lt.${addDays(today, -14)}`)
-      .order("value_score", { ascending: false })
-      .limit(3000);
     const picks = ((around ?? []) as (ClientRow & { last_touch_date: string | null })[])
       .filter((c) => !already.has(c.id))
       .map((c) => ({ c, d: nearbyDistance(focusArea, c.area) }))
