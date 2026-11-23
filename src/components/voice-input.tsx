@@ -21,6 +21,11 @@ function getRecognition(): (new () => Recognition) | null {
   return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
 }
 
+/** iPhone/iPad (iPadOS reports itself as a Mac, so touch support is checked too). */
+function isIOS() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.userAgent.includes("Macintosh") && navigator.maxTouchPoints > 1);
+}
+
 const LANG_KEY = "dictation-lang";
 const LANG_EVENT = "dictation-lang-changed";
 const noopSubscribe = () => () => {};
@@ -57,7 +62,14 @@ export function VoiceTextarea({
   id?: string;
   className?: string;
 }) {
-  const supported = useSyncExternalStore(noopSubscribe, () => Boolean(getRecognition()), () => false);
+  // iOS exposes the browser speech API, but it doesn't start reliably in Home Screen apps.
+  // There the mic opens the keyboard, whose built-in dictation works everywhere.
+  const ios = useSyncExternalStore(noopSubscribe, isIOS, () => false);
+  const browserSpeech = useSyncExternalStore(noopSubscribe, () => Boolean(getRecognition()), () => false);
+  const supported = browserSpeech && !ios;
+  const showMic = supported || ios;
+  const [iosHint, setIosHint] = useState(false);
+  const field = useRef<HTMLTextAreaElement>(null);
   const lang = useSyncExternalStore(subscribeLang, readLang, () => "en-IN");
   const [listening, setListening] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -76,32 +88,42 @@ export function VoiceTextarea({
     const r = new R();
     r.lang = lang;
     // Android Chrome repeats earlier words in continuous mode, so it listens one phrase at a time.
-    r.continuous = !/android/i.test(navigator.userAgent);
+    const android = /android/i.test(navigator.userAgent);
+    r.continuous = !android;
     r.interimResults = true;
     r.onresult = (e) => {
-      let finalText = "", partial = "";
-      for (let i = e.resultIndex; i < e.results.length; i++) {
-        const t = e.results[i][0].transcript;
-        if (e.results[i].isFinal) finalText += t;
-        else partial += t;
-      }
-      if (finalText) base.current = joinText(base.current, finalText);
+      // Rebuild this session's text on every event, so a repeated result can't duplicate words.
+      // Android may report growing copies of the same phrase, so only its latest result counts.
+      const results = Array.from(e.results);
+      const parts = android ? results.slice(-1) : results;
+      const spoken = parts.map((x) => x[0].transcript).join(" ").replace(/\s+/g, " ");
       // Keep the form's value in step with what's on screen, so Save never loses words still being processed.
-      latestOnChange.current(joinText(base.current, partial));
+      latestOnChange.current(joinText(base.current, spoken));
     };
     r.onerror = (e) => {
       if (e.error === "not-allowed" || e.error === "service-not-allowed") setError("Allow microphone access to use voice notes.");
       else if (e.error === "network") setError("Voice notes need an internet connection.");
-      else if (e.error !== "no-speech" && e.error !== "aborted") setError("Couldn't hear that. Try again.");
+      else if (e.error === "no-speech") setError("Didn't hear anything. Tap the mic and try again.");
+      else if (e.error === "audio-capture") setError("Couldn't access the microphone. Close other apps using it and try again.");
+      else if (e.error !== "aborted") setError("Couldn't hear that. Try again.");
     };
     r.onend = () => setListening(false);
     rec.current = r;
-    r.start();
-    setListening(true);
+    try {
+      r.start();
+      setListening(true);
+    } catch {
+      setError("Couldn't start the microphone. Try again.");
+    }
   }
 
   function stop() {
     rec.current?.stop();
+  }
+
+  function openKeyboardDictation() {
+    field.current?.focus();
+    setIosHint(true);
   }
 
   function switchLang(code: string) {
@@ -113,18 +135,19 @@ export function VoiceTextarea({
     <div>
       <div className="relative">
         <textarea
+          ref={field}
           id={id}
           rows={rows}
-          className={`input py-2 ${supported ? "pr-12" : ""} ${className}`}
+          className={`input py-2 ${showMic ? "pr-12" : ""} ${className}`}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           readOnly={listening}
         />
-        {supported && (
+        {showMic && (
           <button
             type="button"
-            onClick={listening ? stop : start}
+            onClick={ios ? openKeyboardDictation : listening ? stop : start}
             aria-label={listening ? "Stop dictation" : "Speak instead of typing"}
             className={`absolute top-1.5 right-1.5 grid size-9 place-items-center rounded-lg ${listening ? "animate-pulse bg-red-600 text-white" : "bg-bg text-brand"}`}
           >
@@ -132,6 +155,11 @@ export function VoiceTextarea({
           </button>
         )}
       </div>
+      {ios && iosHint && (
+        <p className="mt-1 text-xs text-muted">
+          Tap the <Mic size={12} className="inline" /> on your keyboard and speak. No mic there? Turn on Settings → General → Keyboard → Enable Dictation.
+        </p>
+      )}
       {supported && (listening || error) && (
         <div className="mt-1 flex items-center gap-2 text-xs">
           {listening && <span className="text-red-700">Listening… tap ■ when done</span>}
