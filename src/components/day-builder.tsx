@@ -3,7 +3,8 @@
 import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Check, History, MapPin, Plus } from "lucide-react";
+import { Check, History, Plus } from "lucide-react";
+import { AreaPicker } from "./area-picker";
 import { confirmPlan } from "@/app/actions/plan";
 import type { ClientOption } from "@/lib/data";
 import type { DaySummary } from "@/lib/reports";
@@ -32,7 +33,6 @@ export function DayBuilder({
   const [showAll, setShowAll] = useState(false);
   const [adding, setAdding] = useState(false);
   const [addType, setAddType] = useState<ActivityType>("call");
-  const [areaInput, setAreaInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
 
@@ -101,27 +101,7 @@ export function DayBuilder({
         </div>
       )}
 
-      <section className="card space-y-3 p-4">
-        <div className="flex items-center gap-2">
-          <MapPin size={16} className="text-brand" />
-          <p className="text-sm font-semibold">Field area for today</p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {result.areas.slice(0, 6).map((a) => (
-            <button key={a.area} className="chip" data-on={a.area.toLowerCase() === result.focusArea?.toLowerCase()} onClick={() => chooseArea(a.area)}>
-              {a.area} <span className="ml-1 opacity-70">{a.count}</span>
-            </button>
-          ))}
-          {result.focusArea && !result.areas.some((a) => a.area.toLowerCase() === result.focusArea?.toLowerCase()) && (
-            <span className="chip" data-on="true">{result.focusArea}</span>
-          )}
-        </div>
-        <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); if (areaInput.trim()) chooseArea(areaInput.trim()); }}>
-          <input className="input min-h-10 text-sm" placeholder="Going somewhere else? Type the area" value={areaInput} onChange={(e) => setAreaInput(e.target.value)} />
-          <button className="btn-secondary min-h-10">Set</button>
-        </form>
-        {result.areas.length === 0 && !result.focusArea && <p className="text-xs text-muted">No client is due for a visit right now. Pick an area to plan a field day.</p>}
-      </section>
+      <AreaPicker focusArea={result.focusArea} areas={result.areas} options={options} onChoose={chooseArea} />
 
       <section className="card grid grid-cols-3 gap-4 p-4">
         <Meter label="Meet" value={counts.visit} target={profile.target_visits} />

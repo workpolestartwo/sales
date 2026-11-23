@@ -98,6 +98,14 @@ export const OUTCOME_LABELS: Record<Outcome, string> = {
   new_lead: "New lead",
 };
 
+/** Outcome wording that fits the channel, e.g. a call was "Spoke", a text was "Sent". */
+export function outcomeLabel(type: ActivityType, outcome: Outcome): string {
+  if (outcome === "converted") return "Got business";
+  if (outcome === "met") return type === "visit" ? "Met" : type === "call" ? "Spoke" : "Sent";
+  if (outcome === "not_reachable") return type === "visit" ? "Not available" : type === "call" ? "No answer" : "No reply";
+  return OUTCOME_LABELS[outcome];
+}
+
 export const TYPE_NAMES: Record<ActivityType, string> = {
   visit: "Meeting",
   call: "Call",

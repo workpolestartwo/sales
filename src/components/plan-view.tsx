@@ -13,6 +13,9 @@ import { LogSheet, Sheet, TYPE_NAMES, type LogTarget } from "./log-sheet";
 import { Meter, TierBadge, TypeIcon, telHref, tierStripe } from "./ui";
 import { WhatsAppSheet, type WaTarget } from "./whatsapp-sheet";
 
+// Equal-width actions with the icon above the label, so all four fit on a narrow phone.
+const ACTION = "min-h-12! min-w-0 flex-1 basis-0 flex-col gap-0.5! px-1! text-[11px]";
+
 interface Unplanned { id: string; type: ActivityType; outcome: string; clients: { company: string } | null }
 
 export function PlanView({
@@ -100,28 +103,27 @@ export function PlanView({
                     {c && <TierBadge tier={c.tier} />}
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-semibold">{c?.company ?? "Client"}</p>
-                      <p className="truncate text-xs text-muted">
-                        <TypeIcon type={i.type} size={11} /> {TYPE_NAMES[i.type]}{c?.area ? ` · ${c.area}` : ""}{i.reason ? ` · ${i.reason}` : ""}
-                      </p>
+                      <p className="truncate text-xs text-muted">{TYPE_NAMES[i.type]}{c?.area ? ` · ${c.area}` : ""}</p>
+                      {i.reason && <p className="line-clamp-2 text-xs text-muted">{i.reason}</p>}
                     </div>
                     <button aria-label="Drop from plan" className="grid size-9 place-items-center rounded-full text-muted" disabled={pending} onClick={() => run(() => setItemDropped(i.id, true))}>
                       <X size={16} />
                     </button>
                   </div>
-                  <div className="mt-2 flex gap-2 pl-9">
+                  <div className="mt-2 flex gap-1.5">
                     {i.type === "visit" && c && (
-                      <a href={mapsLink([c.company, c.address, c.area])} target="_blank" rel="noreferrer" className="btn-secondary min-h-9 px-3 text-xs" aria-label="Open in Google Maps">
-                        <MapPin size={14} />
+                      <a href={mapsLink([c.company, c.address, c.area])} target="_blank" rel="noreferrer" className={`btn-secondary ${ACTION}`} aria-label="Open in Google Maps">
+                        <MapPin size={16} /> Map
                       </a>
                     )}
                     {c?.phone && (
                       <>
-                        <a href={telHref(c.phone)} className="btn-secondary min-h-9 flex-1 text-xs"><Phone size={14} /> Call</a>
-                        <button onClick={() => setWa({ clientId: c.id, company: c.company, contactPerson: c.contact_person, phone: c.phone, planItemId: i.id })} className="btn-secondary min-h-9 flex-1 text-xs"><MessageCircle size={14} /> WhatsApp</button>
+                        <a href={telHref(c.phone)} className={`btn-secondary ${ACTION}`}><Phone size={16} /> Call</a>
+                        <button onClick={() => setWa({ clientId: c.id, company: c.company, contactPerson: c.contact_person, phone: c.phone, planItemId: i.id })} className={`btn-secondary ${ACTION}`}><MessageCircle size={16} /> WhatsApp</button>
                       </>
                     )}
-                    <button className="btn-primary min-h-9 flex-1 text-xs" onClick={() => c && setLogging({ clientId: c.id, company: c.company, type: i.type, planItemId: i.id })}>
-                      <CheckCircle2 size={14} /> Log
+                    <button className={`btn-primary ${ACTION}`} onClick={() => c && setLogging({ clientId: c.id, company: c.company, type: i.type, planItemId: i.id })}>
+                      <CheckCircle2 size={16} /> Log
                     </button>
                   </div>
                 </li>

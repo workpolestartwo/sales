@@ -2,22 +2,21 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, CalendarCheck, Plus, Settings, Ship, Users } from "lucide-react";
+import { BarChart3, CalendarCheck, Plus, Ship, Users } from "lucide-react";
 
 const ITEMS = [
-  { href: "/today", label: "Today", Icon: CalendarCheck },
-  { href: "/clients", label: "Clients", Icon: Users },
-  { href: "/log", label: "Log", Icon: Plus, primary: true },
-  { href: "/rates", label: "Rates", Icon: Ship },
   { href: "/reports", label: "Reports", Icon: BarChart3 },
-  { href: "/settings", label: "Me", Icon: Settings },
+  { href: "/today", label: "Today", Icon: CalendarCheck },
+  { href: "/log", label: "Log", Icon: Plus, primary: true },
+  { href: "/clients", label: "Clients", Icon: Users },
+  { href: "/rates", label: "Rates", Icon: Ship },
 ];
 
 export function BottomNav() {
   const path = usePathname();
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
-      <ul className="mx-auto grid max-w-xl grid-cols-6">
+      <ul className="mx-auto grid max-w-xl grid-cols-5">
         {ITEMS.map(({ href, label, Icon, primary }) => {
           const active = path.startsWith(href);
           return (

@@ -60,11 +60,12 @@ export function VoiceTextarea({
   const supported = useSyncExternalStore(noopSubscribe, () => Boolean(getRecognition()), () => false);
   const lang = useSyncExternalStore(subscribeLang, readLang, () => "en-IN");
   const [listening, setListening] = useState(false);
-  const [interim, setInterim] = useState("");
   const [error, setError] = useState<string | null>(null);
   const rec = useRef<Recognition | null>(null);
   const base = useRef(value);
+  const latestOnChange = useRef(onChange);
 
+  useEffect(() => { latestOnChange.current = onChange; });
   useEffect(() => () => rec.current?.stop(), []);
 
   function start() {
@@ -74,7 +75,8 @@ export function VoiceTextarea({
     base.current = value;
     const r = new R();
     r.lang = lang;
-    r.continuous = true;
+    // Android Chrome repeats earlier words in continuous mode, so it listens one phrase at a time.
+    r.continuous = !/android/i.test(navigator.userAgent);
     r.interimResults = true;
     r.onresult = (e) => {
       let finalText = "", partial = "";
@@ -83,18 +85,16 @@ export function VoiceTextarea({
         if (e.results[i].isFinal) finalText += t;
         else partial += t;
       }
-      if (finalText) {
-        base.current = joinText(base.current, finalText);
-        onChange(base.current);
-      }
-      setInterim(partial);
+      if (finalText) base.current = joinText(base.current, finalText);
+      // Keep the form's value in step with what's on screen, so Save never loses words still being processed.
+      latestOnChange.current(joinText(base.current, partial));
     };
     r.onerror = (e) => {
       if (e.error === "not-allowed" || e.error === "service-not-allowed") setError("Allow microphone access to use voice notes.");
       else if (e.error === "network") setError("Voice notes need an internet connection.");
       else if (e.error !== "no-speech" && e.error !== "aborted") setError("Couldn't hear that. Try again.");
     };
-    r.onend = () => { setListening(false); setInterim(""); };
+    r.onend = () => setListening(false);
     rec.current = r;
     r.start();
     setListening(true);
@@ -116,7 +116,7 @@ export function VoiceTextarea({
           id={id}
           rows={rows}
           className={`input py-2 ${supported ? "pr-12" : ""} ${className}`}
-          value={listening && interim ? joinText(value, interim) : value}
+          value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           readOnly={listening}

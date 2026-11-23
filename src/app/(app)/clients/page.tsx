@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Plus, Search, Upload } from "lucide-react";
 import { getSession } from "@/lib/data";
 import { addDays, relativeDays, todayIST } from "@/lib/dates";
-import { Clock } from "lucide-react";
+import { ChevronRight, Clock } from "lucide-react";
 import type { Client } from "@/lib/types";
 import { Empty, PageHeader, TierBadge, TierLegend, tierStripe } from "@/components/ui";
 
@@ -58,13 +58,15 @@ export default async function ClientsPage({ searchParams }: { searchParams: Prom
       />
       <div className="space-y-3 p-4">
         {(untouched ?? 0) > 0 && (
-          <Link href="/clients/untouched" className="card flex items-center gap-3 border-red-200 bg-red-50 p-3">
-            <Clock size={18} className="shrink-0 text-red-700" />
-            <span className="flex-1 text-sm">
-              <span className="font-semibold text-red-800">{untouched} untouched clients</span>
-              <span className="text-red-800/80"> · no contact in {profile.stagnant_after_days ?? 60}+ days</span>
+          <Link href="/clients/untouched" className="card flex min-h-16 items-center gap-3 border-red-200 bg-red-50 px-4 py-3 text-red-800">
+            <Clock size={20} className="shrink-0" />
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-semibold">{untouched} untouched clients</span>
+              <span className="block truncate text-xs text-red-700">No contact in {profile.stagnant_after_days ?? 60}+ days</span>
             </span>
-            <span className="text-xs font-semibold text-red-800">View →</span>
+            <span className="flex shrink-0 items-center gap-0.5 text-sm font-semibold">
+              View <ChevronRight size={16} />
+            </span>
           </Link>
         )}
         <form className="relative">

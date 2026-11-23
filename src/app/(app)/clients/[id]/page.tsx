@@ -15,11 +15,11 @@ export default async function ClientPage({ params }: { params: Promise<{ id: str
 
   const [{ data: client }, { data: acts }] = await Promise.all([
     supabase.from("clients").select("*").eq("id", id).maybeSingle(),
-    supabase.from("activities").select("*").eq("client_id", id).order("activity_date", { ascending: false }).order("created_at", { ascending: false }).limit(50),
+    supabase.from("activities").select("*, field_visits(notes)").eq("client_id", id).order("activity_date", { ascending: false }).order("created_at", { ascending: false }).limit(50),
   ]);
   if (!client) notFound();
   const c = client as Client;
-  const activities = (acts ?? []) as Activity[];
+  const activities = (acts ?? []) as (Activity & { field_visits: { notes: string | null } | null })[];
 
   const facts: [string, string][] = [
     ["Contact", c.contact_person ?? "—"],
@@ -83,7 +83,8 @@ export default async function ClientPage({ params }: { params: Promise<{ id: str
                       <span className="font-semibold">{TYPE_NAMES[a.type]}</span> · {OUTCOME_LABELS[a.outcome]}
                       {a.is_cold && <span className="text-muted"> · cold</span>}
                     </p>
-                    {a.notes && <p className="text-muted">{a.notes}</p>}
+                    {a.notes && <p className="whitespace-pre-wrap text-muted">{a.notes}</p>}
+                    {a.field_visits?.notes && <p className="whitespace-pre-wrap text-muted">Visit note: {a.field_visits.notes}</p>}
                     {a.follow_up_date && <p className="text-xs text-muted">Follow-up {formatDate(a.follow_up_date)}</p>}
                   </div>
                   <span className="shrink-0 text-xs text-muted">{formatDate(a.activity_date)}</span>

@@ -37,9 +37,6 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
             prev={`/reports?view=day&date=${addDays(date, -1)}`}
             next={date < today ? `/reports?view=day&date=${addDays(date, 1)}` : null}
           />
-          {summary.planStatus === "confirmed" && date === today && (
-            <p className="rounded-xl bg-sky-50 p-3 text-sm text-sky-900">Today is still open. Numbers update as you log, and missed items are counted once you end the day.</p>
-          )}
           <DaySummaryCard summary={summary} profile={profile} />
         </div>
       </>

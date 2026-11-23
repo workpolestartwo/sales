@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
+import { MeLink } from "./me-link";
 import type { ActivityType, Tier } from "@/lib/types";
 import { MessageCircle, Phone, MapPin } from "lucide-react";
 
-export function PageHeader({ title, subtitle, back, action }: { title: string; subtitle?: string; back?: string; action?: React.ReactNode }) {
+export function PageHeader({ title, subtitle, back, action, hideMe }: { title: string; subtitle?: string; back?: string; action?: React.ReactNode; hideMe?: boolean }) {
   return (
     <header className="sticky top-0 z-20 flex items-center gap-2 border-b border-line bg-bg/95 px-4 pt-[max(env(safe-area-inset-top),0.75rem)] pb-3 backdrop-blur">
       {back && (
@@ -16,6 +17,7 @@ export function PageHeader({ title, subtitle, back, action }: { title: string; s
         {subtitle && <p className="truncate text-xs text-muted">{subtitle}</p>}
       </div>
       {action}
+      {!back && !hideMe && <MeLink compact={Boolean(action)} />}
     </header>
   );
 }
