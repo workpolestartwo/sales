@@ -1,6 +1,6 @@
 -- Polestar Sales: complete database setup for a NEW Supabase project.
 -- Paste this whole file into the SQL Editor once and run it.
--- Generated from supabase/migrations/0001-0010 (those files remain the source of truth).
+-- Generated from supabase/migrations/0001-0013 (those files remain the source of truth).
 
 
 -- ============================================================================
@@ -697,3 +697,387 @@ grant execute on all functions in schema public to service_role;
 alter default privileges in schema public grant all on tables to service_role;
 alter default privileges in schema public grant all on sequences to service_role;
 alter default privileges in schema public grant execute on functions to service_role;
+
+-- ============================================================================
+-- 0011_assignments.sql
+-- ============================================================================
+-- Client assignment: anyone uploads a list (client, area, salesperson), each salesperson
+-- approves the clients put under their name (or passes them to a teammate), then sets each
+-- approved client's priority. Only then does the client enter the contact cycle.
+
+-------------------------------------------------------------------------------
+-- Clients: priority chosen by the salesperson, and "waiting for priority"
+-------------------------------------------------------------------------------
+alter table public.clients drop constraint if exists clients_source_check;
+alter table public.clients add constraint clients_source_check check (source in ('master_list', 'field', 'manual', 'assigned'));
+alter table public.clients
+  add column if not exists manual_tier text check (manual_tier in ('A', 'B', 'C')),
+  add column if not exists priority_pending boolean not null default false;
+create index if not exists clients_owner_priority_pending_idx on public.clients (owner_id) where priority_pending;
+
+-------------------------------------------------------------------------------
+-- Team directory: names only, so anyone can pick who a client belongs to
+-------------------------------------------------------------------------------
+create or replace function public.team_members()
+returns table (id uuid, full_name text)
+language sql stable security definer set search_path = public as $$
+  select p.id, coalesce(nullif(btrim(p.full_name), ''), 'Unnamed member')
+  from profiles p
+  where auth.uid() is not null
+  order by 2
+$$;
+grant execute on function public.team_members() to authenticated;
+revoke execute on function public.team_members() from anon, public;
+
+-------------------------------------------------------------------------------
+-- Assignments (one row per client put under a salesperson's name)
+-------------------------------------------------------------------------------
+create table public.client_assignments (
+  id uuid primary key default gen_random_uuid(),
+  batch_id uuid not null,
+  assignee_id uuid not null references auth.users (id) on delete cascade,
+  assigned_by uuid not null default auth.uid() references auth.users (id) on delete cascade,
+  assigned_by_name text,
+  company text not null,
+  area text,
+  contact_person text,
+  phone text,
+  notes text,
+  status text not null default 'pending' check (status in ('pending', 'accepted', 'duplicate', 'reassigned', 'dropped')),
+  client_id uuid references public.clients (id) on delete set null,
+  reassigned_to uuid references auth.users (id) on delete set null,
+  decided_at timestamptz,
+  created_at timestamptz not null default now()
+);
+create index client_assignments_assignee_idx on public.client_assignments (assignee_id, status);
+create index client_assignments_batch_idx on public.client_assignments (batch_id);
+
+-- Stamp who assigned it (can't be faked from the app).
+create or replace function public.stamp_assignment()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if auth.uid() is not null then new.assigned_by := auth.uid(); end if;
+  select coalesce(nullif(btrim(full_name), ''), 'A teammate') into new.assigned_by_name from profiles where id = new.assigned_by;
+  return new;
+end $$;
+create trigger client_assignments_stamp before insert on public.client_assignments
+  for each row execute function public.stamp_assignment();
+
+alter table public.client_assignments enable row level security;
+create policy "see mine or ones I sent" on public.client_assignments for select to authenticated
+  using (assignee_id = auth.uid() or assigned_by = auth.uid());
+create policy "anyone can assign" on public.client_assignments for insert to authenticated
+  with check (assigned_by = auth.uid());
+create policy "assignee decides" on public.client_assignments for update to authenticated
+  using (assignee_id = auth.uid()) with check (assignee_id = auth.uid());
+grant select, insert, update on public.client_assignments to authenticated;
+grant all on public.client_assignments to service_role;
+revoke all on public.client_assignments from anon;
+
+-------------------------------------------------------------------------------
+-- Approve: each approved client joins my list, waiting for me to set its priority.
+-- A client already in my list (same name, however written) isn't added twice.
+-------------------------------------------------------------------------------
+create or replace function public.accept_assignments(p_ids uuid[])
+returns int language plpgsql security invoker set search_path = public as $$
+declare
+  r record;
+  v_client uuid;
+  v_added int := 0;
+begin
+  for r in
+    select * from client_assignments
+    where id = any (p_ids) and assignee_id = auth.uid() and status = 'pending'
+  loop
+    select id into v_client from clients where owner_id = auth.uid() and company_key = normalize_company(r.company);
+    if v_client is null then
+      insert into clients (owner_id, company, area, contact_person, phone, notes, source, status, priority_pending)
+      values (auth.uid(), btrim(r.company), r.area, r.contact_person, r.phone, r.notes, 'assigned', 'active', true)
+      returning id into v_client;
+      update client_assignments set status = 'accepted', client_id = v_client, decided_at = now() where id = r.id;
+      v_added := v_added + 1;
+    else
+      update clients set
+        area = coalesce(area, r.area),
+        contact_person = coalesce(contact_person, r.contact_person),
+        phone = coalesce(phone, r.phone)
+      where id = v_client;
+      update client_assignments set status = 'duplicate', client_id = v_client, decided_at = now() where id = r.id;
+    end if;
+  end loop;
+  return v_added;
+end $$;
+
+-------------------------------------------------------------------------------
+-- Not mine: pass these clients to a teammate as a new request from me.
+-------------------------------------------------------------------------------
+create or replace function public.reassign_assignments(p_ids uuid[], p_to uuid)
+returns uuid language plpgsql security invoker set search_path = public as $$
+declare v_batch uuid := gen_random_uuid();
+begin
+  if p_to is null or p_to = auth.uid() then
+    raise exception 'Pick a teammate to pass these clients to';
+  end if;
+  insert into client_assignments (batch_id, assignee_id, assigned_by, company, area, contact_person, phone, notes)
+  select v_batch, p_to, auth.uid(), company, area, contact_person, phone, notes
+  from client_assignments
+  where id = any (p_ids) and assignee_id = auth.uid() and status = 'pending';
+
+  update client_assignments set status = 'reassigned', reassigned_to = p_to, decided_at = now()
+  where id = any (p_ids) and assignee_id = auth.uid() and status = 'pending';
+  return v_batch;
+end $$;
+
+grant execute on function public.accept_assignments(uuid[]) to authenticated;
+grant execute on function public.reassign_assignments(uuid[], uuid) to authenticated;
+revoke execute on function public.accept_assignments(uuid[]) from anon, public;
+revoke execute on function public.reassign_assignments(uuid[], uuid) from anon, public;
+
+-------------------------------------------------------------------------------
+-- Scoring: the salesperson's chosen priority always wins. Clients waiting for a
+-- priority aren't scheduled yet.
+-------------------------------------------------------------------------------
+create or replace function public.refresh_client_scores(p_today date)
+returns void language plpgsql security invoker set search_path = public as $$
+declare
+  v_max int;
+  v_total int;
+  v_every int;
+  v_focus int;
+begin
+  select greatest(max(total_shipments), 1), count(*) into v_max, v_total from clients where owner_id = auth.uid();
+  select contact_every_days, focus_count into v_every, v_focus from profiles where id = auth.uid();
+  v_every := coalesce(v_every, 7);
+  v_focus := coalesce(v_focus, 60);
+
+  update clients c set
+    value_score = s.score,
+    tier = case
+      when c.manual_tier is not null then c.manual_tier
+      when s.score = 0 then 'C'
+      when s.rn <= v_focus then 'A'
+      when s.rn <= v_focus + ceil(0.3 * v_total) then 'B'
+      else 'C' end
+  from (
+    select id, score,
+      row_number() over (order by score desc, last_shipment_date desc nulls last, total_shipments desc, id) as rn
+    from (
+      select id, last_shipment_date, total_shipments,
+        round(
+          60 * ln(1 + total_shipments) / ln(1 + v_max)
+          + case
+              when last_shipment_date is null then 0
+              when p_today - last_shipment_date <= 30 then 40
+              when p_today - last_shipment_date <= 90 then 30
+              when p_today - last_shipment_date <= 180 then 20
+              when p_today - last_shipment_date <= 365 then 10
+              else 0
+            end
+        )::int as score
+      from clients where owner_id = auth.uid()
+    ) raw
+  ) s
+  where c.id = s.id;
+
+  update clients set next_due_date = case
+    when priority_pending then null
+    when status <> 'lost' and (
+      tier = 'A'
+      or (status = 'prospect' and source <> 'master_list' and created_at > now() - interval '60 days')
+    ) then coalesce(least(next_follow_up, last_touch_date + v_every), p_today)
+    else next_follow_up
+  end
+  where owner_id = auth.uid();
+end $$;
+
+grant execute on function public.refresh_client_scores(date) to authenticated, service_role;
+revoke execute on function public.refresh_client_scores(date) from anon, public;
+
+-- ============================================================================
+-- 0012_admin_and_team_dedupe.sql
+-- ============================================================================
+-- Admins + team-wide duplicate detection.
+--
+-- * profiles.role: 'member' (default) or 'admin'. Members can't change their own role.
+--   Make someone admin in the SQL editor:
+--     update public.profiles set role = 'admin'
+--     where id = (select id from auth.users where email = 'someone@example.com');
+-- * Admin data comes only through admin_* functions, which return nothing for non-admins.
+--   Row-level security is unchanged, so everyone's own screens still show only their own data.
+-- * client_presence(): who already has a client (or a pending request for it), across the
+--   whole team, so uploads never create the same client twice.
+
+alter table public.profiles add column if not exists role text not null default 'member' check (role in ('member', 'admin'));
+
+-- Members may edit their own profile, but not their role.
+revoke update on public.profiles from authenticated;
+grant update (
+  full_name, target_visits, target_calls, target_texts, onboarded,
+  contact_every_days, focus_count, stagnant_after_days,
+  notify_enabled, morning_time, evening_time, templates_seeded, day_started_on
+) on public.profiles to authenticated;
+-- NOTE: a future migration that adds an editable profile column must grant update on it too.
+
+create or replace function public.is_admin()
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists (select 1 from profiles where id = auth.uid() and role = 'admin')
+$$;
+
+-- Same duplicate key on requests, so pending requests can be matched quickly.
+alter table public.client_assignments
+  add column if not exists company_key text generated always as (public.normalize_company(company)) stored;
+create index if not exists client_assignments_key_idx on public.client_assignments (company_key) where status = 'pending';
+create index if not exists clients_company_key_idx on public.clients (company_key);
+
+-------------------------------------------------------------------------------
+-- Who already has these clients? (any salesperson, or a pending request)
+-------------------------------------------------------------------------------
+create or replace function public.client_presence(p_keys text[])
+returns table (company_key text, owner_id uuid, owner_name text, kind text)
+language sql stable security definer set search_path = public as $$
+  select c.company_key, c.owner_id, coalesce(nullif(btrim(p.full_name), ''), 'Unnamed member'), 'client'
+  from clients c join profiles p on p.id = c.owner_id
+  where auth.uid() is not null and c.company_key = any (p_keys)
+  union all
+  select a.company_key, a.assignee_id, coalesce(nullif(btrim(p.full_name), ''), 'Unnamed member'), 'request'
+  from client_assignments a join profiles p on p.id = a.assignee_id
+  where auth.uid() is not null and a.status = 'pending' and a.company_key = any (p_keys)
+$$;
+
+-------------------------------------------------------------------------------
+-- Admin: every client of every salesperson, plus requests awaiting approval
+-------------------------------------------------------------------------------
+create or replace function public.admin_master_list()
+returns table (
+  id uuid, company text, area text, contact_person text, phone text, tier text, status text,
+  priority_pending boolean, last_touch_date date, next_due_date date, total_shipments int,
+  source text, created_at timestamptz, owner_id uuid, owner_name text, kind text
+)
+language sql stable security definer set search_path = public as $$
+  select c.id, c.company, c.area, c.contact_person, c.phone, c.tier, c.status,
+         c.priority_pending, c.last_touch_date, c.next_due_date, c.total_shipments,
+         c.source, c.created_at, c.owner_id, coalesce(nullif(btrim(p.full_name), ''), 'Unnamed member'), 'client'
+  from clients c join profiles p on p.id = c.owner_id
+  where public.is_admin()
+  union all
+  select a.id, a.company, a.area, a.contact_person, a.phone, null::text, 'awaiting approval',
+         false, null::date, null::date, 0,
+         'assigned', a.created_at, a.assignee_id, coalesce(nullif(btrim(p.full_name), ''), 'Unnamed member'), 'request'
+  from client_assignments a join profiles p on p.id = a.assignee_id
+  where a.status = 'pending' and public.is_admin()
+  order by 15, 2
+$$;
+
+-------------------------------------------------------------------------------
+-- Admin: performance of each salesperson for a date range (inclusive, IST dates)
+-------------------------------------------------------------------------------
+create or replace function public.admin_team_performance(p_start date, p_end date)
+returns table (
+  member_id uuid, member_name text, role text,
+  clients_total int, clients_top int, need_priority int, pending_requests int, untouched int,
+  visits int, calls int, texts int, converted int, new_clients int,
+  days_planned int, items_planned int, items_done int, last_active date,
+  target_visits int, target_calls int, target_texts int
+)
+language sql stable security definer set search_path = public as $$
+  select
+    p.id, coalesce(nullif(btrim(p.full_name), ''), 'Unnamed member'), p.role,
+    (select count(*)::int from clients c where c.owner_id = p.id and c.status <> 'lost'),
+    (select count(*)::int from clients c where c.owner_id = p.id and c.status <> 'lost' and not c.priority_pending and c.tier = 'A'),
+    (select count(*)::int from clients c where c.owner_id = p.id and c.priority_pending),
+    (select count(*)::int from client_assignments a where a.assignee_id = p.id and a.status = 'pending'),
+    (select count(*)::int from clients c where c.owner_id = p.id and c.status <> 'lost' and not c.priority_pending
+       and (c.last_touch_date is null or c.last_touch_date < p_end - coalesce(p.stagnant_after_days, 60))),
+    (select count(*)::int from activities x where x.owner_id = p.id and x.type = 'visit' and x.activity_date between p_start and p_end),
+    (select count(*)::int from activities x where x.owner_id = p.id and x.type = 'call' and x.activity_date between p_start and p_end),
+    (select count(*)::int from activities x where x.owner_id = p.id and x.type = 'text' and x.activity_date between p_start and p_end),
+    (select count(*)::int from activities x where x.owner_id = p.id and x.outcome = 'converted' and x.activity_date between p_start and p_end),
+    (select count(*)::int from clients c where c.owner_id = p.id and c.source in ('field', 'manual')
+       and (c.created_at at time zone 'Asia/Kolkata')::date between p_start and p_end),
+    (select count(*)::int from day_plans d where d.owner_id = p.id and d.status <> 'draft' and d.plan_date between p_start and p_end),
+    (select count(*)::int from plan_items i join day_plans d on d.id = i.plan_id
+       where d.owner_id = p.id and d.plan_date between p_start and p_end and i.status <> 'dropped'),
+    (select count(*)::int from plan_items i join day_plans d on d.id = i.plan_id
+       where d.owner_id = p.id and d.plan_date between p_start and p_end and i.status = 'done'),
+    (select max(x.activity_date) from activities x where x.owner_id = p.id),
+    p.target_visits, p.target_calls, p.target_texts
+  from profiles p
+  where public.is_admin()
+  order by 2
+$$;
+
+grant execute on function public.is_admin(), public.client_presence(text[]), public.admin_master_list(), public.admin_team_performance(date, date) to authenticated;
+revoke execute on function public.is_admin(), public.client_presence(text[]), public.admin_master_list(), public.admin_team_performance(date, date) from anon, public;
+grant execute on function public.is_admin(), public.client_presence(text[]), public.admin_master_list(), public.admin_team_performance(date, date) to service_role;
+
+-- ============================================================================
+-- 0013_approval_for_all_uploads.sql
+-- ============================================================================
+-- Every uploaded client goes through approval -> priority before it appears in the CRM,
+-- including the uploader's own clients. Requests now carry the sheet's other columns
+-- (shipments, dates, email...) so nothing is lost when the client is approved.
+
+alter table public.client_assignments add column if not exists details jsonb not null default '{}'::jsonb;
+
+create or replace function public.accept_assignments(p_ids uuid[])
+returns int language plpgsql security invoker set search_path = public as $$
+declare
+  r record;
+  d jsonb;
+  v_client uuid;
+  v_added int := 0;
+begin
+  for r in
+    select * from client_assignments
+    where id = any (p_ids) and assignee_id = auth.uid() and status = 'pending'
+  loop
+    d := coalesce(r.details, '{}'::jsonb);
+    select id into v_client from clients where owner_id = auth.uid() and company_key = normalize_company(r.company);
+    if v_client is null then
+      insert into clients (
+        owner_id, company, area, contact_person, phone, notes, email, address, industry,
+        total_shipments, first_shipment_date, last_shipment_date, last_meeting_date, last_contact_date, next_follow_up,
+        source, status, priority_pending
+      ) values (
+        auth.uid(), btrim(r.company), r.area, r.contact_person, r.phone, r.notes,
+        nullif(d ->> 'email', ''), nullif(d ->> 'address', ''), nullif(d ->> 'industry', ''),
+        coalesce((d ->> 'total_shipments')::int, 0),
+        (d ->> 'first_shipment_date')::date, (d ->> 'last_shipment_date')::date,
+        (d ->> 'last_meeting_date')::date, (d ->> 'last_contact_date')::date, (d ->> 'next_follow_up')::date,
+        'assigned', 'active', true
+      )
+      returning id into v_client;
+      update client_assignments set status = 'accepted', client_id = v_client, decided_at = now() where id = r.id;
+      v_added := v_added + 1;
+    else
+      update clients set
+        area = coalesce(area, r.area),
+        contact_person = coalesce(contact_person, r.contact_person),
+        phone = coalesce(phone, r.phone)
+      where id = v_client;
+      update client_assignments set status = 'duplicate', client_id = v_client, decided_at = now() where id = r.id;
+    end if;
+  end loop;
+  return v_added;
+end $$;
+
+-- Passing clients to a teammate keeps their details too.
+create or replace function public.reassign_assignments(p_ids uuid[], p_to uuid)
+returns uuid language plpgsql security invoker set search_path = public as $$
+declare v_batch uuid := gen_random_uuid();
+begin
+  if p_to is null or p_to = auth.uid() then
+    raise exception 'Pick a teammate to pass these clients to';
+  end if;
+  insert into client_assignments (batch_id, assignee_id, assigned_by, company, area, contact_person, phone, notes, details)
+  select v_batch, p_to, auth.uid(), company, area, contact_person, phone, notes, details
+  from client_assignments
+  where id = any (p_ids) and assignee_id = auth.uid() and status = 'pending';
+
+  update client_assignments set status = 'reassigned', reassigned_to = p_to, decided_at = now()
+  where id = any (p_ids) and assignee_id = auth.uid() and status = 'pending';
+  return v_batch;
+end $$;
+
+grant execute on function public.accept_assignments(uuid[]), public.reassign_assignments(uuid[], uuid) to authenticated, service_role;
+revoke execute on function public.accept_assignments(uuid[]), public.reassign_assignments(uuid[], uuid) from anon, public;

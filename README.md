@@ -30,6 +30,20 @@ Mobile-first CRM for the sales team: upload a master list, get clients ranked by
 - Field-visit "new offices", cold calls and manual adds also reuse the existing client if the name matches.
 - Test files: `sample-data/sample-master-list.xlsx` (250 clients) then `sample-master-list-batch2.xlsx` (80 rows = 50 new + 20 existing written differently + 10 repeats). Expected result: 300 clients. Regenerate with `node scripts/make-sample-data.mjs`.
 
+### Uploading clients (yours and teammates')
+- One upload: **Clients → Upload** (or Me → Upload more clients). **Every new client becomes an approval request** for its salesperson, the uploader included (with a salesperson column like "Sales Team", each row goes to that person; without it, all go to you). Clients already in your CRM are just updated. Requests keep every sheet column (shipments, dates, email…).
+- **A client only appears in the CRM once it's approved and given a priority** (Top / Medium / Low). Until then it's hidden from client lists, the Day Builder, pickers and the untouched list. A banner, "N new clients waiting to join your CRM", stays on Today and Clients. Clients a rep adds by hand, from a cold call or on a field visit, appear immediately.
+- Salesperson names are matched to accounts (full name in any case/spacing, or a unique first name). Unmatched names can be matched by hand or skipped, so **create each salesperson's account, with their full name, before uploading**.
+- **Duplicates are checked across the whole team**, on screen and again on the server. A client already in anyone's list, or already awaiting anyone's approval, is skipped and listed, e.g. "SUPER VEDIC · with Deepak Singh".
+- Teammates get a push notification and a **"N new clients for you"** banner. They approve per client or all at once. **Not mine** passes clients to another teammate, or removes them.
+- Approved clients wait in **Set priority** (Top / Medium / Low) and aren't scheduled until set. The salesperson's choice always wins and can be changed on the client page.
+
+### Admin
+- `profiles.role = 'admin'` (set in SQL only; members can't change their role):
+  `update public.profiles set role = 'admin' where id = (select id from auth.users where email = 'you@example.com');`
+- Admins get **Me → Admin**: a **master list** of every client of every salesperson, plus pending requests, with search, filters and Excel download. Also **team performance** per week: meetings, calls and texts against targets, plan completion, clients, Top priority, untouched clients, items needing priority, and pending approvals.
+- Admin data comes only from `admin_*` database functions, so admins' own daily screens still show only their own clients.
+
 ### Priority (in SQL: `refresh_client_scores`)
 - **Score 0–100** = shipment volume (60 pts, log scale relative to the member's biggest client) + shipment recency (40 pts: ≤30d 40, ≤90d 30, ≤180d 20, ≤365d 10).
 - **Tier A = the focus list**: the member's top 60 clients by score (`profiles.focus_count`). **B** = the next 30% of the list, **C** = the rest. Clients with no shipments are always C.

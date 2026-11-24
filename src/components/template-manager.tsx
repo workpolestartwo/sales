@@ -3,7 +3,8 @@
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Plus, Trash2 } from "lucide-react";
-import { deleteTemplate, saveTemplate, type Template } from "@/app/actions/templates";
+import { deleteTemplate, saveTemplate } from "@/app/actions/templates";
+import type { Template } from "@/lib/templates";
 import { PLACEHOLDERS } from "@/lib/templates";
 import { Sheet } from "./log-sheet";
 import { Empty } from "./ui";

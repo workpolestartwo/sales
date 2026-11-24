@@ -4,6 +4,7 @@ import { getSession } from "@/lib/data";
 import { addDays, relativeDays, todayIST } from "@/lib/dates";
 import { ChevronRight, Clock } from "lucide-react";
 import type { Client } from "@/lib/types";
+import { InboxBanners } from "@/components/inbox-banners";
 import { Empty, PageHeader, TierBadge, TierLegend, tierStripe } from "@/components/ui";
 
 const FILTERS = [
@@ -22,9 +23,10 @@ export default async function ClientsPage({ searchParams }: { searchParams: Prom
 
   let query = supabase
     .from("clients")
-    .select("id, company, contact_person, area, tier, status, value_score, next_due_date, last_contact_date, last_meeting_date, total_shipments", { count: "exact" })
+    .select("id, company, contact_person, area, tier, status, value_score, next_due_date, last_contact_date, last_meeting_date, total_shipments, priority_pending, source", { count: "exact" })
     .order("tier")
     .order("value_score", { ascending: false })
+    .eq("priority_pending", false) // not in the CRM until approved and prioritised
     .limit(200);
 
   const term = q.trim().replace(/[,%()*]/g, " ").slice(0, 60);
@@ -40,6 +42,7 @@ export default async function ClientsPage({ searchParams }: { searchParams: Prom
       .from("clients")
       .select("id", { count: "exact", head: true })
       .neq("status", "lost")
+      .eq("priority_pending", false)
       .or(`last_touch_date.is.null,last_touch_date.lt.${addDays(today, -(profile.stagnant_after_days ?? 60))}`),
   ]);
   const clients = (data ?? []) as Client[];
@@ -57,6 +60,7 @@ export default async function ClientsPage({ searchParams }: { searchParams: Prom
         }
       />
       <div className="space-y-3 p-4">
+        <InboxBanners />
         {(untouched ?? 0) > 0 && (
           <Link href="/clients/untouched" className="card flex min-h-16 items-center gap-3 border-red-200 bg-red-50 px-4 py-3 text-red-800">
             <Clock size={20} className="shrink-0" />
@@ -97,7 +101,7 @@ export default async function ClientsPage({ searchParams }: { searchParams: Prom
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-semibold">{c.company}</p>
                       <p className="truncate text-xs text-muted">
-                        {[c.area, c.status === "prospect" ? "Prospect" : `${c.total_shipments} shipments`, `contact ${relativeDays(last, today)}`].filter(Boolean).join(" · ")}
+                        {[c.priority_pending ? "Needs priority" : null, c.area, c.status === "prospect" ? "Prospect" : c.source === "assigned" && !c.total_shipments ? null : `${c.total_shipments} shipments`, `contact ${relativeDays(last, today)}`].filter(Boolean).join(" · ")}
                       </p>
                     </div>
                     {due && <span className="shrink-0 rounded-full bg-violet-100 px-2 py-0.5 text-[11px] font-semibold text-violet-700">Due</span>}

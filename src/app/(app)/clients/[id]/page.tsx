@@ -6,7 +6,8 @@ import { formatDate, relativeDays, todayIST } from "@/lib/dates";
 import type { Activity, Client } from "@/lib/types";
 import { OUTCOME_LABELS, TYPE_NAMES } from "@/lib/types";
 import { ClientActions } from "@/components/client-actions";
-import { PageHeader, TierBadge, TypeIcon, tierStripe } from "@/components/ui";
+import { PageHeader, TypeIcon, tierStripe } from "@/components/ui";
+import { PriorityPicker } from "@/components/priority-picker";
 
 export default async function ClientPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -43,12 +44,11 @@ export default async function ClientPage({ params }: { params: Promise<{ id: str
         action={<Link href={`/clients/${c.id}/edit`} className="grid size-10 place-items-center rounded-full text-muted" aria-label="Edit"><Pencil size={18} /></Link>}
       />
       <div className="space-y-4 p-4">
-        <section className={`card flex items-center gap-4 p-4 ${tierStripe(c.tier)}`}>
-          <TierBadge tier={c.tier} />
-          <div className="flex-1 text-sm">
-            <p className="font-semibold">Priority {c.tier} · score {c.value_score}/100</p>
+        <section className={`card space-y-3 p-4 ${tierStripe(c.tier)}`}>
+          <PriorityPicker clientId={c.id} current={c.tier} chosen={Boolean(c.manual_tier)} />
+          <div className="text-sm">
             <p className="text-muted">
-              {c.next_due_date
+              {c.priority_pending ? "Pick a priority to add this client to your daily plan." : c.next_due_date
                 ? c.next_due_date <= today ? `Due for contact${c.next_due_date < today ? ` since ${formatDate(c.next_due_date)}` : " today"}` : `Next contact due ${formatDate(c.next_due_date)}`
                 : "No contact due"}
               {c.next_follow_up && ` · follow-up ${formatDate(c.next_follow_up)}`}

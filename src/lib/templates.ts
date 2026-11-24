@@ -31,6 +31,12 @@ export const STARTER_TEMPLATES = [
   },
 ];
 
+export interface Template {
+  id: string;
+  name: string;
+  body: string;
+}
+
 export interface QuoteLane {
   key: string;
   direction: "export" | "import";

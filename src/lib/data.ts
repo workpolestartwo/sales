@@ -18,6 +18,7 @@ export const getClientOptions = cache(async (): Promise<ClientOption[]> => {
     .from("clients")
     .select("id, company, contact_person, area, tier, phone, status")
     .neq("status", "lost")
+    .eq("priority_pending", false)
     .order("company")
     .limit(5000);
   return (data ?? []) as ClientOption[];

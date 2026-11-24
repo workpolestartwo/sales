@@ -6,6 +6,7 @@ import { todayIST } from "@/lib/dates";
 import { normalizeCompany } from "@/lib/company-key";
 import { date, int, str, type ActionResult } from "@/lib/validate";
 import type { ImportRow } from "@/lib/import-fields";
+import type { Presence } from "@/lib/team-match";
 
 const MAX_ROWS_PER_CALL = 1000;
 
@@ -45,7 +46,9 @@ export async function getCompanyKeys(): Promise<{ keys: string[]; error?: string
  */
 export async function importClients(
   rows: ImportRow[],
-): Promise<ActionResult & { inserted?: number; updated?: number; merged?: number; skipped?: number }> {
+  /** Uploads only update clients already in the CRM; new ones go through approval. */
+  updateOnly = false,
+): Promise<ActionResult & { inserted?: number; updated?: number; merged?: number; skipped?: number; taken?: number }> {
   if (!Array.isArray(rows) || rows.length === 0) return { inserted: 0, updated: 0, merged: 0, skipped: 0 };
   if (rows.length > MAX_ROWS_PER_CALL) return { error: "Too many rows in one batch." };
   const { supabase, user } = await requireUser();
@@ -53,16 +56,25 @@ export async function importClients(
   // 1. Clean + merge repeats within this batch.
   let skipped = 0, merged = 0;
   const byKey = new Map<string, Clean>();
+  const explicitZero = new Set<string>();
   for (const r of rows) {
     const c = clean(r);
     if (!c) { skipped++; continue; }
     const key = normalizeCompany(c.company);
+    if (r.total_shipments === 0) explicitZero.add(key);
     const prev = byKey.get(key);
     if (prev) { byKey.set(key, mergeInto(prev, c)); merged++; }
     else byKey.set(key, c);
   }
 
-  // 2. Which already exist?
+  // 2. Skip clients that already belong to a teammate (or await a teammate's approval).
+  let taken = 0;
+  const { data: present } = await supabase.rpc("client_presence", { p_keys: [...byKey.keys()] });
+  for (const p of (present ?? []) as Presence[]) {
+    if (p.owner_id !== user.id && byKey.delete(p.company_key)) taken++;
+  }
+
+  // 3. Which are already in my list?
   const keys = [...byKey.keys()];
   const existing = new Map<string, Clean & { id: string; status: string }>();
   for (let i = 0; i < keys.length; i += 200) {
@@ -94,14 +106,17 @@ export async function importClients(
   await Promise.all(updates);
 
   // 4. Insert the new ones. The unique index is the final guard; conflicts are ignored.
-  const fresh = [...byKey].filter(([key]) => !existing.has(key)).map(([, c]) => ({
+  // With no shipment data there's nothing to rank on, so the salesperson picks each
+  // client's priority (Set priority list). A sheet that says 0 shipments means a prospect.
+  const fresh = [...byKey].filter(([key]) => !existing.has(key)).map(([key, c]) => ({
     ...c,
     owner_id: user.id,
     source: "master_list" as const,
-    status: c.total_shipments > 0 ? ("active" as const) : ("prospect" as const),
+    status: explicitZero.has(key) ? ("prospect" as const) : ("active" as const),
+    priority_pending: c.total_shipments === 0 && !c.last_shipment_date,
   }));
   let inserted = 0;
-  if (fresh.length) {
+  if (fresh.length && !updateOnly) {
     const { data, error } = await supabase
       .from("clients")
       .upsert(fresh, { onConflict: "owner_id,company_key", ignoreDuplicates: true })
@@ -110,7 +125,7 @@ export async function importClients(
     inserted = data?.length ?? 0;
   }
 
-  return { inserted, updated, merged, skipped };
+  return { inserted, updated, merged, skipped, taken };
 }
 
 /** Scores every client and marks the member as onboarded. */

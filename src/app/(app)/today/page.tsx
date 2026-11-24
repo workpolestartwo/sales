@@ -8,6 +8,7 @@ import { PlanView } from "@/components/plan-view";
 import { DaySummaryCard } from "@/components/day-summary";
 import { ReopenButton } from "@/components/reopen-button";
 import { PageHeader } from "@/components/ui";
+import { InboxBanners } from "@/components/inbox-banners";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +34,7 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
     return (
       <>
         <PageHeader title="Build your day" subtitle={title} />
+        <div className="px-4 pt-4 empty:hidden"><InboxBanners /></div>
         <DayBuilder key={result.focusArea ?? "none"} profile={profile} result={result} yesterday={yesterday.hasPlan ? yesterday : null} options={options} />
       </>
     );
@@ -44,6 +46,7 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
       <>
         <PageHeader title="Day closed" subtitle={title} />
         <div className="space-y-4 p-4">
+          <InboxBanners />
           <DaySummaryCard summary={summary} profile={profile} />
           {summary.missedItems.length > 0 && (
             <p className="px-1 text-sm text-muted">
@@ -76,6 +79,7 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
   return (
     <>
       <PageHeader title="Today" subtitle={`${title}${plan.focus_area ? ` · ${plan.focus_area}` : ""}`} />
+      <div className="px-4 pt-4 empty:hidden"><InboxBanners /></div>
       <PlanView
         today={today}
         focusArea={plan.focus_area}

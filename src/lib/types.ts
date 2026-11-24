@@ -21,6 +21,8 @@ export interface Profile {
   contact_every_days: number;
   focus_count: number;
   stagnant_after_days: number;
+  /** "admin" sees the master list and team performance. Set in the database only. */
+  role?: "member" | "admin";
   notify_enabled?: boolean;
   morning_time?: string;
   evening_time?: string;
@@ -44,10 +46,14 @@ export interface Client {
   last_touch_date: string | null;
   next_follow_up: string | null;
   notes: string | null;
-  source: "master_list" | "field" | "manual";
+  source: "master_list" | "field" | "manual" | "assigned";
   status: ClientStatus;
   value_score: number;
   tier: Tier;
+  /** Priority chosen by the salesperson; always wins over the automatic tier. */
+  manual_tier: Tier | null;
+  /** Approved from an assignment but no priority chosen yet (not scheduled). */
+  priority_pending: boolean;
   next_due_date: string | null;
   created_at: string;
 }

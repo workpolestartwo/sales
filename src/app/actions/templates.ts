@@ -4,14 +4,9 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/supabase/server";
 import { todayIST } from "@/lib/dates";
 import { CONTAINER_LABELS, CONTAINER_TYPES, money, suggestedQuote, type Rate } from "@/lib/rates";
-import { STARTER_TEMPLATES, type QuoteLane } from "@/lib/templates";
+import { STARTER_TEMPLATES, type QuoteLane, type Template } from "@/lib/templates";
 import { str, uuid, type ActionResult } from "@/lib/validate";
 
-export interface Template {
-  id: string;
-  name: string;
-  body: string;
-}
 
 /** The member's own templates. The first time, they get a few starters to edit. */
 export async function listTemplates(): Promise<Template[]> {

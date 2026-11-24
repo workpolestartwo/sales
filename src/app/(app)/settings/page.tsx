@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronRight, FileUp, History, MessageSquareText } from "lucide-react";
+import { ChevronRight, FileUp, History, MessageSquareText, ShieldCheck } from "lucide-react";
 import { getSession } from "@/lib/data";
 import { ProfileForm } from "@/components/profile-form";
 import { NotificationSettings } from "@/components/notification-settings";
@@ -9,7 +9,7 @@ import { PageHeader } from "@/components/ui";
 export default async function SettingsPage() {
   const { supabase, profile } = await getSession();
   const [{ count }, { count: templates }] = await Promise.all([
-    supabase.from("clients").select("id", { count: "exact", head: true }),
+    supabase.from("clients").select("id", { count: "exact", head: true }).eq("priority_pending", false),
     supabase.from("message_templates").select("id", { count: "exact", head: true }),
   ]);
 
@@ -17,6 +17,17 @@ export default async function SettingsPage() {
     <>
       <PageHeader back="/today" title={profile.full_name?.trim() || "Me"} />
       <div className="space-y-4 p-4">
+        {profile.role === "admin" && (
+          <Link href="/admin" className="card flex items-center gap-3 border-brand/30 p-4">
+            <ShieldCheck size={20} className="shrink-0 text-brand" />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold">Admin</p>
+              <p className="text-xs text-muted">Master list of every client, and the team&apos;s performance</p>
+            </div>
+            <ChevronRight size={18} className="shrink-0 text-muted" />
+          </Link>
+        )}
+
         <Link href="/settings/history" className="card flex items-center gap-3 p-4">
           <History size={20} className="shrink-0 text-brand" />
           <div className="min-w-0 flex-1">
@@ -41,7 +52,7 @@ export default async function SettingsPage() {
           <FileUp size={20} className="text-brand" />
           <div className="flex-1">
             <p className="text-sm font-semibold">Upload more clients</p>
-            <p className="text-xs text-muted">{count ?? 0} clients in your list. Duplicates are merged, never added twice.</p>
+            <p className="text-xs text-muted">{count ?? 0} clients in your list. Teammates&apos; clients in the sheet are sent to them for approval.</p>
           </div>
         </Link>
 

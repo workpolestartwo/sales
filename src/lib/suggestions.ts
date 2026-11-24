@@ -82,6 +82,7 @@ export async function buildSuggestions(
       .select("id, company, contact_person, phone, area, tier, status, next_due_date, next_follow_up, last_contact_date, last_meeting_date, last_touch_date, total_shipments")
       .neq("status", "lost")
       .gt("value_score", 0)
+      .eq("priority_pending", false)
       .or(`last_touch_date.is.null,last_touch_date.lt.${stagnantBefore}`)
       .order("value_score", { ascending: false })
       .limit(REVIVE_PER_DAY * 4),
@@ -90,6 +91,7 @@ export async function buildSuggestions(
       .from("clients")
       .select("id, company, contact_person, phone, area, tier, status, next_due_date, next_follow_up, last_contact_date, last_meeting_date, last_touch_date, value_score")
       .neq("status", "lost")
+      .eq("priority_pending", false)
       .not("area", "is", null)
       .or(`last_meeting_date.is.null,last_meeting_date.lt.${addDays(today, -14)}`)
       .order("value_score", { ascending: false })

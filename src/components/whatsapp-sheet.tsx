@@ -3,7 +3,8 @@
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { CheckCircle2, MessageCircle, Settings2 } from "lucide-react";
-import { getQuoteLanes, listTemplates, type Template } from "@/app/actions/templates";
+import { getQuoteLanes, listTemplates } from "@/app/actions/templates";
+import type { Template } from "@/lib/templates";
 import { formatDate } from "@/lib/dates";
 import { fillTemplate, ratesText, type QuoteLane } from "@/lib/templates";
 import { logOrQueue } from "@/lib/offline-queue";

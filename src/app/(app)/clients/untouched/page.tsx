@@ -16,6 +16,7 @@ export default async function UntouchedPage() {
     .from("clients")
     .select("id, company, contact_person, phone, area, tier, status, value_score, total_shipments, last_shipment_date, last_touch_date, next_follow_up")
     .neq("status", "lost")
+    .eq("priority_pending", false)
     .or(`last_touch_date.is.null,last_touch_date.lt.${before}`)
     .order("value_score", { ascending: false })
     .limit(3000);
