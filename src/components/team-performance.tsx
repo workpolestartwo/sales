@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import { relativeDays } from "@/lib/dates";
 import { Empty, TypeIcon } from "./ui";
 
@@ -46,7 +48,7 @@ function Metric({ type, label, value, target }: { type: "visit" | "call" | "text
 }
 
 /** Admin: one card per salesperson for the chosen week. Targets = daily target × working days. */
-export function TeamPerformance({ members, workingDays, today }: { members: MemberStats[]; workingDays: number; today: string }) {
+export function TeamPerformance({ members, workingDays, today, openFlags = {} }: { members: MemberStats[]; workingDays: number; today: string; openFlags?: Record<string, number> }) {
   if (!members.length) return <Empty title="No team members yet" />;
 
   const sum = (k: keyof MemberStats) => members.reduce((s, m) => s + (Number(m[k]) || 0), 0);
@@ -72,14 +74,16 @@ export function TeamPerformance({ members, workingDays, today }: { members: Memb
         {members.map((m) => {
           const completion = m.items_planned ? Math.round((m.items_done / m.items_planned) * 100) : null;
           const flags = [
+            openFlags[m.member_id] && `${openFlags[m.member_id]} open flag${openFlags[m.member_id] === 1 ? "" : "s"}`,
             m.pending_requests && `${m.pending_requests} awaiting approval`,
             m.need_priority && `${m.need_priority} need priority`,
           ].filter(Boolean);
           return (
-            <li key={m.member_id} className="card space-y-3 p-4">
-              <div className="flex items-baseline justify-between gap-3">
-                <p className="truncate font-semibold">{m.member_name}{m.role === "admin" && <span className="ml-1.5 text-xs font-medium text-muted">admin</span>}</p>
-                <p className="shrink-0 text-xs text-muted">active {relativeDays(m.last_active, today)}</p>
+            <li key={m.member_id}>
+             <Link href={`/admin/member/${m.member_id}`} className="card block space-y-3 p-4 active:bg-bg">
+              <div className="flex items-center justify-between gap-3">
+                <p className="truncate font-semibold">{m.member_name}</p>
+                <p className="flex shrink-0 items-center gap-1 text-xs text-muted">active {relativeDays(m.last_active, today)} <ChevronRight size={14} /></p>
               </div>
 
               <div className="grid grid-cols-3 gap-3">
@@ -101,6 +105,7 @@ export function TeamPerformance({ members, workingDays, today }: { members: Memb
                 <div><p className={`font-semibold tabular-nums ${m.untouched ? "text-red-700" : ""}`}>{m.untouched}</p><p className="text-[11px] text-muted">Untouched</p></div>
               </div>
               {flags.length > 0 && <p className="text-xs font-medium text-amber-800">{flags.join(" · ")}</p>}
+             </Link>
             </li>
           );
         })}

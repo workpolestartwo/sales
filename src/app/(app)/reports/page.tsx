@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { getSession } from "@/lib/data";
+import { getSalesSession } from "@/lib/data";
 import { addDays, formatDate, todayIST, weekRange } from "@/lib/dates";
 import { getDaySummary, getWeekSummary, WORKING_DAYS } from "@/lib/reports";
 import { DaySummaryCard, Stat } from "@/components/day-summary";
@@ -13,7 +13,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
   const view = sp.view === "week" ? "week" : "day";
   const today = todayIST();
   const date = sp.date && /^\d{4}-\d{2}-\d{2}$/.test(sp.date) && sp.date <= today ? sp.date : today;
-  const { supabase, profile } = await getSession();
+  const { supabase, profile } = await getSalesSession();
 
   const tabs = (
     <div className="grid grid-cols-2 gap-1 rounded-xl bg-line/60 p-1">

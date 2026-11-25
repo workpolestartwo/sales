@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { Download, Search } from "lucide-react";
 import { formatDate, relativeDays } from "@/lib/dates";
 import type { Tier } from "@/lib/types";
@@ -36,9 +37,9 @@ function stateLabel(r: MasterRow) {
 }
 
 /** Admin: one searchable list of every salesperson's clients, with Excel download. */
-export function MasterList({ rows, today }: { rows: MasterRow[]; today: string }) {
+export function MasterList({ rows, today, initialOwner = "" }: { rows: MasterRow[]; today: string; initialOwner?: string }) {
   const [q, setQ] = useState("");
-  const [owner, setOwner] = useState("");
+  const [owner, setOwner] = useState(initialOwner);
   const [show, setShow] = useState<Show>("all");
 
   const owners = useMemo(() => {
@@ -113,12 +114,14 @@ export function MasterList({ rows, today }: { rows: MasterRow[]; today: string }
           {list.slice(0, 300).map((r) => {
             const state = stateLabel(r);
             return (
-              <li key={`${r.kind}-${r.id}`} className="flex items-center gap-3 px-4 py-3">
+              <li key={`${r.kind}-${r.id}`}>
+               <Link href={r.kind === "client" ? `/admin/client/${r.id}` : `/admin/member/${r.owner_id}`} className="flex items-center gap-3 px-4 py-3 active:bg-bg">
                 {r.tier && r.kind === "client" && !r.priority_pending ? <TierBadge tier={r.tier} /> : <span className="size-6 shrink-0 rounded-md border border-dashed border-line" />}
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-semibold">{r.company}</span>
                   <span className="block truncate text-xs text-muted">{[r.owner_name, r.area, state ?? (r.kind === "client" ? `contact ${relativeDays(r.last_touch_date, today)}` : null)].filter(Boolean).join(" · ")}</span>
                 </span>
+               </Link>
               </li>
             );
           })}

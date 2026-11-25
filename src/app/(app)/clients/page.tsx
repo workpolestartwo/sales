@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Plus, Search, Upload } from "lucide-react";
-import { getSession } from "@/lib/data";
+import { getSalesSession } from "@/lib/data";
 import { addDays, relativeDays, todayIST } from "@/lib/dates";
 import { ChevronRight, Clock } from "lucide-react";
 import type { Client } from "@/lib/types";
@@ -18,7 +18,7 @@ const FILTERS = [
 
 export default async function ClientsPage({ searchParams }: { searchParams: Promise<{ q?: string; f?: string }> }) {
   const { q = "", f = "" } = await searchParams;
-  const { supabase } = await getSession();
+  const { supabase } = await getSalesSession();
   const today = todayIST();
 
   let query = supabase
@@ -35,7 +35,7 @@ export default async function ClientsPage({ searchParams }: { searchParams: Prom
   else if (f === "prospect") query = query.eq("status", "prospect");
   else if (["A", "B", "C"].includes(f)) query = query.eq("tier", f);
 
-  const { profile } = await getSession();
+  const { profile } = await getSalesSession();
   const [{ data, count }, { count: untouched }] = await Promise.all([
     query,
     supabase

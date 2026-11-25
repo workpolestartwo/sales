@@ -1,4 +1,4 @@
-import { getSession } from "@/lib/data";
+import { getSalesSession } from "@/lib/data";
 import { getTeam } from "@/app/actions/assignments";
 import { ImportWizard } from "@/components/import-wizard";
 import { PageHeader } from "@/components/ui";
@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/ui";
 export const dynamic = "force-dynamic";
 
 export default async function ImportPage() {
-  const [{ user }, team] = await Promise.all([getSession(), getTeam()]);
+  const [{ user }, team] = await Promise.all([getSalesSession(), getTeam()]);
   return (
     <>
       <PageHeader back="/clients" title="Upload more clients" subtitle="Teammates' clients are sent to them for approval" />

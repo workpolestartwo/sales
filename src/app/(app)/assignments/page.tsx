@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getSession } from "@/lib/data";
+import { getSalesSession } from "@/lib/data";
 import { getTeam } from "@/app/actions/assignments";
 import { AssignmentReview, type PendingAssignment } from "@/components/assignment-review";
 import { Empty, PageHeader } from "@/components/ui";
@@ -7,7 +7,7 @@ import { Empty, PageHeader } from "@/components/ui";
 export const dynamic = "force-dynamic";
 
 export default async function AssignmentsPage() {
-  const { supabase, user } = await getSession();
+  const { supabase, user } = await getSalesSession();
   const [{ data }, team, { count: needPriority }] = await Promise.all([
     supabase
       .from("client_assignments")

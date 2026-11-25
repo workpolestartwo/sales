@@ -1,10 +1,12 @@
 import { listTemplates } from "@/app/actions/templates";
+import { getSalesSession } from "@/lib/data";
 import { TemplateManager } from "@/components/template-manager";
 import { PageHeader } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
 export default async function TemplatesPage() {
+  await getSalesSession();
   const templates = await listTemplates();
   return (
     <>

@@ -1,22 +1,25 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Pencil } from "lucide-react";
-import { getSession } from "@/lib/data";
+import { getSession, isManagement } from "@/lib/data";
 import { formatDate, relativeDays, todayIST } from "@/lib/dates";
 import type { Activity, Client } from "@/lib/types";
 import { OUTCOME_LABELS, TYPE_NAMES } from "@/lib/types";
 import { ClientActions } from "@/components/client-actions";
 import { PageHeader, TypeIcon, tierStripe } from "@/components/ui";
 import { PriorityPicker } from "@/components/priority-picker";
+import { FlagCard, type FlagItem } from "@/components/messaging";
 
 export default async function ClientPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { supabase, profile } = await getSession();
+  if (isManagement(profile)) redirect(`/admin/client/${id}`);
   const today = todayIST();
 
-  const [{ data: client }, { data: acts }] = await Promise.all([
+  const [{ data: client }, { data: acts }, { data: flags }] = await Promise.all([
     supabase.from("clients").select("*").eq("id", id).maybeSingle(),
     supabase.from("activities").select("*, field_visits(notes)").eq("client_id", id).order("activity_date", { ascending: false }).order("created_at", { ascending: false }).limit(50),
+    supabase.from("flags").select("id, note, status, created_by_name, created_at, done_note, done_at, client_id").eq("client_id", id).eq("status", "open"),
   ]);
   if (!client) notFound();
   const c = client as Client;
@@ -55,6 +58,8 @@ export default async function ClientPage({ params }: { params: Promise<{ id: str
             </p>
           </div>
         </section>
+
+        {((flags ?? []) as FlagItem[]).map((f) => <FlagCard key={f.id} flag={f} canClose />)}
 
         <ClientActions client={{ id: c.id, company: c.company, phone: c.phone, contactPerson: c.contact_person, address: c.address, area: c.area }} today={today} myName={profile.full_name ?? ""} />
 

@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { getSession } from "@/lib/data";
+import { getSalesSession } from "@/lib/data";
 import { PriorityQueue, type QueueClient } from "@/components/priority-queue";
 import { Empty, PageHeader } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
 export default async function PriorityPage() {
-  const { supabase } = await getSession();
+  const { supabase } = await getSalesSession();
   const { data } = await supabase
     .from("clients")
     .select("id, company, area, contact_person")

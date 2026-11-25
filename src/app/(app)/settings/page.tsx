@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ChevronRight, FileUp, History, MessageSquareText, ShieldCheck } from "lucide-react";
-import { getSession } from "@/lib/data";
+import { ChevronRight, FileUp, History, MessageSquareText, MessagesSquare } from "lucide-react";
+import { getSession, isManagement } from "@/lib/data";
 import { ProfileForm } from "@/components/profile-form";
 import { NotificationSettings } from "@/components/notification-settings";
 import { SignOutButton } from "@/components/sign-out-button";
@@ -8,54 +8,48 @@ import { PageHeader } from "@/components/ui";
 
 export default async function SettingsPage() {
   const { supabase, profile } = await getSession();
+  const title = profile.full_name?.trim() || "Me";
+
+  // Management (Director / VP): no sales settings.
+  if (isManagement(profile)) {
+    return (
+      <>
+        <PageHeader back="/admin/team" title={title} subtitle="Management account" />
+        <div className="space-y-4 p-4">
+          <NotificationSettings profile={profile} management />
+          <ProfileForm profile={profile} management />
+          <SignOutButton />
+        </div>
+      </>
+    );
+  }
+
   const [{ count }, { count: templates }] = await Promise.all([
     supabase.from("clients").select("id", { count: "exact", head: true }).eq("priority_pending", false),
     supabase.from("message_templates").select("id", { count: "exact", head: true }),
   ]);
 
+  const link = (href: string, Icon: typeof History, label: string, sub: string) => (
+    <Link href={href} className="card flex items-center gap-3 p-4">
+      <Icon size={20} className="shrink-0 text-brand" />
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-semibold">{label}</p>
+        <p className="text-xs text-muted">{sub}</p>
+      </div>
+      <ChevronRight size={18} className="shrink-0 text-muted" />
+    </Link>
+  );
+
   return (
     <>
-      <PageHeader back="/today" title={profile.full_name?.trim() || "Me"} />
+      <PageHeader back="/today" title={title} />
       <div className="space-y-4 p-4">
-        {profile.role === "admin" && (
-          <Link href="/admin" className="card flex items-center gap-3 border-brand/30 p-4">
-            <ShieldCheck size={20} className="shrink-0 text-brand" />
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold">Admin</p>
-              <p className="text-xs text-muted">Master list of every client, and the team&apos;s performance</p>
-            </div>
-            <ChevronRight size={18} className="shrink-0 text-muted" />
-          </Link>
-        )}
-
-        <Link href="/settings/history" className="card flex items-center gap-3 p-4">
-          <History size={20} className="shrink-0 text-brand" />
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold">Work history</p>
-            <p className="text-xs text-muted">Every meeting, call and text, day by day</p>
-          </div>
-          <ChevronRight size={18} className="shrink-0 text-muted" />
-        </Link>
-
+        {link("/messages", MessagesSquare, "From management", "Flags and messages from the Director and VP")}
+        {link("/settings/history", History, "Work history", "Every meeting, call and text, day by day")}
         <NotificationSettings profile={profile} />
         <ProfileForm profile={profile} />
-
-        <Link href="/settings/templates" className="card flex items-center gap-3 p-4">
-          <MessageSquareText size={20} className="text-brand" />
-          <div className="flex-1">
-            <p className="text-sm font-semibold">My WhatsApp templates</p>
-            <p className="text-xs text-muted">{templates ? `${templates} saved` : "Ready-made messages with live quote rates"}</p>
-          </div>
-        </Link>
-
-        <Link href="/settings/import" className="card flex items-center gap-3 p-4">
-          <FileUp size={20} className="text-brand" />
-          <div className="flex-1">
-            <p className="text-sm font-semibold">Upload more clients</p>
-            <p className="text-xs text-muted">{count ?? 0} clients in your list. Teammates&apos; clients in the sheet are sent to them for approval.</p>
-          </div>
-        </Link>
-
+        {link("/settings/templates", MessageSquareText, "My WhatsApp templates", templates ? `${templates} saved` : "Ready-made messages with live quote rates")}
+        {link("/settings/import", FileUp, "Upload more clients", `${count ?? 0} clients in your CRM. New ones are sent for approval.`)}
         <SignOutButton />
       </div>
     </>

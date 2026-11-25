@@ -1,4 +1,4 @@
-import { getClientOptions, getSession } from "@/lib/data";
+import { getClientOptions, getSalesSession } from "@/lib/data";
 import { addDays, formatDate, todayIST } from "@/lib/dates";
 import { buildSuggestions } from "@/lib/suggestions";
 import { getDaySummary } from "@/lib/reports";
@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 
 export default async function TodayPage({ searchParams }: { searchParams: Promise<{ area?: string }> }) {
   const { area } = await searchParams;
-  const { supabase, profile } = await getSession();
+  const { supabase, profile } = await getSalesSession();
   const today = todayIST();
   const title = formatDate(today, { weekday: "long", day: "numeric", month: "short" });
 

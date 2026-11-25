@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
   const now = nowIST();
 
   const [{ data: profiles, error }, { data: allSubs }] = await Promise.all([
-    db.from("profiles").select("id, morning_time, evening_time").eq("notify_enabled", true).eq("onboarded", true),
+    db.from("profiles").select("id, morning_time, evening_time").eq("notify_enabled", true).eq("onboarded", true).neq("role", "admin"),
     db.from("push_subscriptions").select("id, owner_id, endpoint, p256dh, auth"),
   ]);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

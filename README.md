@@ -38,11 +38,16 @@ Mobile-first CRM for the sales team: upload a master list, get clients ranked by
 - Teammates get a push notification and a **"N new clients for you"** banner. They approve per client or all at once. **Not mine** passes clients to another teammate, or removes them.
 - Approved clients wait in **Set priority** (Top / Medium / Low) and aren't scheduled until set. The salesperson's choice always wins and can be changed on the client page.
 
-### Admin
-- `profiles.role = 'admin'` (set in SQL only; members can't change their role):
-  `update public.profiles set role = 'admin' where id = (select id from auth.users where email = 'you@example.com');`
-- Admins get **Me → Admin**: a **master list** of every client of every salesperson, plus pending requests, with search, filters and Excel download. Also **team performance** per week: meetings, calls and texts against targets, plan completion, clients, Top priority, untouched clients, items needing priority, and pending approvals.
-- Admin data comes only from `admin_*` database functions, so admins' own daily screens still show only their own clients.
+### Management accounts (Director / VP)
+- `profiles.role = 'admin'` makes an account a **management account**. It's set in SQL only; members can't change their role:
+  `update public.profiles set role = 'admin' where id = (select id from auth.users where email = 'director@example.com');`
+- Management accounts **don't sell**: no Today, Log, Day Builder, uploads, targets or templates. They're left out of salesperson dropdowns, performance cards and daily reminders. Their navigation is **Team · Clients · Messages · Rates**.
+  - **Team:** weekly performance per salesperson. Tap one for their numbers, last 30 days of work, flags, and Message / Flag buttons.
+  - **Clients:** the master list of every client (search, filter, Excel). Tap one for its details, owner and history, and **Flag this client**.
+  - **Messages:** one conversation per salesperson, shared by all management accounts, plus **Message everyone**.
+- **Flags** go to the salesperson as a notification, a red banner on Today and Clients, and a note on the client page. They **mark them done** with an optional reply, which management sees.
+- Salespeople see everything from management under **Me → From management** (`/messages`) and can reply there.
+- Management data comes only from `admin_*` functions and admin-aware row security on `flags` and `messages`.
 
 ### Priority (in SQL: `refresh_client_scores`)
 - **Score 0–100** = shipment volume (60 pts, log scale relative to the member's biggest client) + shipment recency (40 pts: ≤30d 40, ≤90d 30, ≤180d 20, ≤365d 10).

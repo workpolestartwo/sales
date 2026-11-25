@@ -1,4 +1,4 @@
-import { getSession } from "@/lib/data";
+import { getSalesSession } from "@/lib/data";
 import { addDays, todayIST } from "@/lib/dates";
 import type { Client } from "@/lib/types";
 import { UntouchedList, type UntouchedRow } from "@/components/untouched-list";
@@ -7,7 +7,7 @@ import { PageHeader } from "@/components/ui";
 export const dynamic = "force-dynamic";
 
 export default async function UntouchedPage() {
-  const { supabase, profile } = await getSession();
+  const { supabase, profile } = await getSalesSession();
   const today = todayIST();
   const days = profile.stagnant_after_days ?? 60;
   const before = addDays(today, -days);

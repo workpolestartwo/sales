@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { saveProfile } from "@/app/actions/profile";
 import type { Profile } from "@/lib/types";
 
-export function ProfileForm({ profile }: { profile: Profile }) {
+export function ProfileForm({ profile, management = false }: { profile: Profile; management?: boolean }) {
   const [state, action, pending] = useActionState(saveProfile, undefined);
   return (
     <form action={action} className="card space-y-4 p-4">
@@ -12,6 +12,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
         <label className="label" htmlFor="full_name">Name</label>
         <input id="full_name" name="full_name" className="input" defaultValue={profile.full_name ?? ""} />
       </div>
+      {!management && (<>
       <div>
         <p className="label">Daily targets</p>
         <div className="grid grid-cols-3 gap-2">
@@ -44,6 +45,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
           <span>days</span>
         </div>
       </div>
+      </>)}
       {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
       {state?.ok && !pending && <p className="text-sm text-emerald-700">Saved.</p>}
       <button className="btn-primary w-full" disabled={pending}>{pending ? "Saving…" : "Save"}</button>

@@ -13,7 +13,7 @@ function urlBase64ToUint8Array(base64: string) {
   return Uint8Array.from([...raw].map((c) => c.charCodeAt(0)));
 }
 
-export function NotificationSettings({ profile }: { profile: Profile & { notify_enabled?: boolean; morning_time?: string; evening_time?: string } }) {
+export function NotificationSettings({ profile, management = false }: { profile: Profile & { notify_enabled?: boolean; morning_time?: string; evening_time?: string }; management?: boolean }) {
   const [state, setState] = useState<State>("loading");
   const [msg, setMsg] = useState<string | null>(null);
   const [pending, start] = useTransition();
@@ -76,7 +76,7 @@ export function NotificationSettings({ profile }: { profile: Profile & { notify_
     <section className="card space-y-4 p-4">
       <div className="flex items-center gap-2">
         <Bell size={18} className="text-brand" />
-        <p className="font-semibold">Reminders</p>
+        <p className="font-semibold">{management ? "Notifications" : "Reminders"}</p>
       </div>
 
       {state === "ios-install" && (
@@ -100,8 +100,9 @@ export function NotificationSettings({ profile }: { profile: Profile & { notify_
         </div>
       )}
       {msg && <p className="text-sm text-muted">{msg}</p>}
+      {management && <p className="text-xs text-muted">Get a notification when someone on the team replies to you.</p>}
 
-      <form action={saveAction} className="space-y-3 border-t border-line pt-3">
+      {!management && <form action={saveAction} className="space-y-3 border-t border-line pt-3">
         <label className="flex items-center justify-between gap-3 text-sm">
           <span>Send me daily reminders</span>
           <input type="checkbox" name="notify_enabled" defaultChecked={profile.notify_enabled ?? true} className="size-5 accent-[var(--brand)]" />
@@ -119,7 +120,7 @@ export function NotificationSettings({ profile }: { profile: Profile & { notify_
         {saved?.error && <p className="text-sm text-red-600">{saved.error}</p>}
         {saved?.ok && !saving && <p className="text-sm text-emerald-700">Saved.</p>}
         <button className="btn-secondary w-full" disabled={saving}>{saving ? "Saving…" : "Save reminder times"}</button>
-      </form>
+      </form>}
     </section>
   );
 }

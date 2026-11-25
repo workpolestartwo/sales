@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
-import { getSession } from "@/lib/data";
+import { getSalesSession } from "@/lib/data";
 import { getTeam } from "@/app/actions/assignments";
 import { ImportWizard } from "@/components/import-wizard";
 
 export default async function OnboardingPage() {
-  const [{ profile, user }, team] = await Promise.all([getSession(), getTeam()]);
+  const [{ profile, user }, team] = await Promise.all([getSalesSession(), getTeam()]);
   if (profile?.onboarded) redirect("/today");
 
   return (

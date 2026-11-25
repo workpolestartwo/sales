@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getSession } from "@/lib/data";
+import { getSalesSession } from "@/lib/data";
 import { todayIST } from "@/lib/dates";
 import { PageHeader } from "@/components/ui";
 import { WorkHistory, type HistoryEntry } from "@/components/work-history";
@@ -18,7 +18,7 @@ export default async function WorkHistoryPage({ searchParams }: { searchParams: 
   const sp = await searchParams;
   const type = FILTERS.some((f) => f.key === sp.type) ? sp.type! : "";
   const limit = Math.min(2000, Math.max(PAGE, Number(sp.n) || PAGE));
-  const { supabase } = await getSession();
+  const { supabase } = await getSalesSession();
 
   let query = supabase
     .from("activities")
